@@ -19,6 +19,7 @@ export function Upload() {
   const [isUploading, setIsUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [repos, setRepos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -86,7 +87,18 @@ export function Upload() {
   }, [router])
 
   async function handleRepoSelect(data: any) {
+    setIsLoading(true)
+    const [repo_owner, repo_name] = data.full_name.split("/")
 
+    const response = await (await
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}`,
+        {
+          method: 'POST',
+        }
+      )
+    ).json()
+
+    setIsLoading(false)
   }
 
   return (
@@ -99,37 +111,46 @@ export function Upload() {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          {isUploading ? (
+          {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-primary" />
               <div className="space-y-2">
-                <h3 className="text-xl font-medium">Processando seu projeto</h3>
-                <p className="text-muted-foreground">Estamos analisando seu código e gerando a documentação...</p>
+                <h3 className="text-xl font-medium">Documentando seu projeto</h3>
+                <p className="text-muted-foreground">Estamos documentando seus códigos...</p>
               </div>
             </div>
-          ) : repos.length ? (
-            <div className="flex flex-wrap gap-4">
-              {repos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="flex flex-col items-center justify-center space-y-4 w-1/2 max-w-[300px]">
-                <FileArchive className="h-12 w-12 text-primary" />
+          ) :
+            isUploading ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 <div className="space-y-2">
-                  <h3 className="text-x font-medium">{el.name}</h3>
-                  <a target="_blank" href={el.clone_url}><p className="text-muted-foreground">link do repo</p></a>
+                  <h3 className="text-xl font-medium">Processando seus projetos</h3>
+                  <p className="text-muted-foreground">Estamos buscando seus códigos...</p>
                 </div>
-              </div>)}
-            </div>
-          ) : (
-            <div onClick={connectGithub} className="flex flex-col items-center justify-center space-y-4 cursor-pointer">
-              <UploadIcon className="h-12 w-12 text-muted-foreground" />
-              <div className="space-y-2">
-                <h3 className="text-xl font-medium">Importe seu projeto github aqui</h3>
-                {/* <p className="text-muted-foreground">Ou clique para selecionar um arquivo</p> */}
               </div>
-              {/* <input type="file" id="file-upload" className="hidden" accept=".zip" onChange={handleFileChange} /> */}
-              <Button className="cursor-pointer" asChild>
-                <label htmlFor="file-upload"> <img src="/github.svg" alt="Github logo" width={16} height={16} />Conectar github</label>
-              </Button>
-            </div>
-          )}
+            ) : repos.length ? (
+              <div className="flex flex-wrap gap-4 justify-center">
+                {repos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="flex flex-col items-center justify-center space-y-4 w-1/2 max-w-[300px]">
+                  <FileArchive className="h-12 w-12 text-primary" />
+                  <div className="space-y-2">
+                    <h3 className="text-x font-medium">{el.name}</h3>
+                    <a target="_blank" href={el.clone_url}><p className="text-muted-foreground">link do repo</p></a>
+                  </div>
+                </div>)}
+              </div>
+            ) : (
+              <div onClick={connectGithub} className="flex flex-col items-center justify-center space-y-4 cursor-pointer">
+                <UploadIcon className="h-12 w-12 text-muted-foreground" />
+                <div className="space-y-2">
+                  <h3 className="text-xl font-medium">Importe seu projeto github aqui</h3>
+                  {/* <p className="text-muted-foreground">Ou clique para selecionar um arquivo</p> */}
+                </div>
+                {/* <input type="file" id="file-upload" className="hidden" accept=".zip" onChange={handleFileChange} /> */}
+                <Button className="cursor-pointer" asChild>
+                  <label htmlFor="file-upload"> <img src="/github.svg" alt="Github logo" width={16} height={16} />Conectar github</label>
+                </Button>
+              </div>
+            )}
         </div>
       </CardContent>
     </Card>

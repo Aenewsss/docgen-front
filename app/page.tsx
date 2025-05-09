@@ -2,6 +2,7 @@ import { Upload } from "@/components/upload"
 import { Features } from "@/components/features"
 import { Examples } from "@/components/examples"
 import { Header } from "@/components/header"
+import { Suspense } from "react"
 
 export default function Home() {
   return (
@@ -16,7 +17,10 @@ export default function Home() {
             Importe seu projeto git e obtenha uma documentação completa e organizada em segundos
           </p>
         </div>
-        <Upload />
+        <Suspense fallback={<div>Carregando...</div>}>
+          <Upload />
+        </Suspense>
+
         <Features />
         <Examples />
       </main>
