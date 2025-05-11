@@ -1,9 +1,12 @@
 'use client'
 import { Header } from "@/components/header";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, ref } from "firebase/database";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown"
@@ -15,6 +18,10 @@ export default function Page() {
     const [currentProjectFolder, setCurrentProjectFolder] = useState<any>();
     const [currentPath, setCurrentPath] = useState('');
     const [doc, setDoc] = useState('');
+    const [messages, setMessages] = useState<{ text: string, fromAI: boolean }[]>([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [previewMessage, setPreviewMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     async function getData() {
         const dbRef = ref(db, user.uid)
@@ -49,6 +56,25 @@ export default function Page() {
         }
     }
 
+    async function sendNewMessage() {
+        setPreviewMessage(newMessage)
+        setNewMessage('')
+        setIsLoading(true)
+        const response = await (await fetch(`${process.env.NEXT_PUBLIC_N8N_CHAT}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                newMessage,
+                project: currentPath.split('/')[1]
+            })
+        })).json()
+
+        console.log(response)
+
+        setPreviewMessage('')
+        setMessages([...messages, ...[{ text: newMessage, fromAI: false }, { text: response.output, fromAI: true }]])
+        setIsLoading(false)
+    }
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
@@ -60,6 +86,54 @@ export default function Page() {
                     <p className="text-xl text-muted-foreground">
                         Aqui estarão listados seus projetos com uma documentação completa e organizada
                     </p>
+                    {currentPath && <div className="w-full max-w-3xl border rounded-lg p-4 mb-12 shadow-md">
+                        <h2 className="text-xl font-semibold mb-0">Converse com a IA DocGen</h2>
+                        <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
+                        <div className="bg-muted-foreground/10 rounded-md p-4 space-y-4 max-h-[400px] overflow-y-auto">
+                            <div className="flex gap-2 items-start">
+                                <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
+                                    <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
+                                </div>
+                                <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                    Olá! Como posso te ajudar com seu projeto?
+                                </p>
+                            </div>
+                            {
+                                messages.map((message, index) =>
+                                    message.fromAI ? <div key={index} className="flex gap-2 items-start">
+                                        <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
+                                            <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
+                                        </div>
+                                        <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
+                                            <ReactMarkdown>{message.text}</ReactMarkdown>
+                                        </p>
+                                    </div>
+                                        : <div className="flex gap-2 items-start justify-end">
+                                            <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                                {message.text}
+                                            </p>
+                                        </div>
+                                )
+                            }
+                            {
+                                previewMessage && <div className="flex gap-2 items-start justify-end">
+                                    <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                        {previewMessage}
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                        <div className="mt-4 flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Digite sua mensagem..."
+                                className="flex-1 px-4 py-2 border rounded-md shadow-sm"
+                                value={newMessage}
+                                onChange={(e: any) => setNewMessage(e.target.value)}
+                            />
+                            <Button onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-white" /> : 'Enviar'}</Button>
+                        </div>
+                    </div>}
                     <div className="text-start flex gap-2">
                         {currentPath && <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>}
                         {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
