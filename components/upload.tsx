@@ -84,6 +84,8 @@ export function Upload() {
       localStorage.setItem('github_token', searchParams.get('token')!)
 
       getReposData(searchParams.get('token')!)
+    } else {
+      getReposData()
     }
   }, [router])
 
