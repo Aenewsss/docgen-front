@@ -91,7 +91,7 @@ export function Upload() {
     const [repo_owner, repo_name] = data.full_name.split("/")
 
     const response = await (await
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}`,
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}&user=${user.uid}`,
         {
           method: 'POST',
         }
