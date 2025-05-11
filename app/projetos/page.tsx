@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, ref } from "firebase/database";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown"
 
@@ -31,8 +32,11 @@ export default function Page() {
         getData()
     }, [user]);
 
+    useEffect(() => {
+        chooseProject()
+    }, [currentPath]);
+
     async function chooseProject(project?: string) {
-        console.log(currentPath, project)
         const path = currentPath || `${user.uid}/${project}`
         const dbRef = ref(db, path)
 
@@ -45,12 +49,6 @@ export default function Page() {
         }
     }
 
-    useEffect(() => {
-        chooseProject()
-    }, [currentPath]);
-
-    console.log(doc)
-
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
@@ -62,6 +60,17 @@ export default function Page() {
                     <p className="text-xl text-muted-foreground">
                         Aqui estarão listados seus projetos com uma documentação completa e organizada
                     </p>
+                    <div className="text-start flex gap-2">
+                        {currentPath && <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>}
+                        {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
+                            <span onClick={() => {
+                                if (index < arr.length - 1) {
+                                    console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
+                                    setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
+                                }
+                            }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
+                        )}
+                    </div>
                 </div>
                 {
                     doc && <div className="fixed top-0 start-0 w-screen h-screen z-50 flex justify-center items-center">
