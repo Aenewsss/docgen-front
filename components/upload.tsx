@@ -14,7 +14,7 @@ export function Upload() {
   const searchParams = useSearchParams()
 
   const { user } = useAuth()
-
+console.log(user)
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
@@ -91,7 +91,7 @@ export function Upload() {
     const [repo_owner, repo_name] = data.full_name.split("/")
 
     const response = await (await
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}&user=${user.uid}`,
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}&user=${user.uid}&email=${user.email}`,
         {
           method: 'POST',
         }
