@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { UploadIcon, FileArchive, Loader2 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 
 export function Upload() {
 
@@ -14,7 +15,7 @@ export function Upload() {
   const searchParams = useSearchParams()
 
   const { user } = useAuth()
-console.log(user)
+  console.log(user)
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
@@ -103,6 +104,9 @@ console.log(user)
 
   return (
     <Card className="w-full max-w-3xl mx-auto mb-16">
+      {user && <div className="flex justify-center mt-4">
+        <Link href="/projetos"><Button>Acessar meus projetos</Button></Link>
+      </div>}
       <CardContent className="p-6">
         <div
           className={`border-2 border-dashed rounded-lg p-12 text-center ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/20"
