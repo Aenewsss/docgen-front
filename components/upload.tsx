@@ -162,9 +162,6 @@ export function Upload() {
             <p className="mb-4">Custo estimado: <strong>R$ {tokenEstimation.estimated_cost_brl.toLocaleString('pt-BR')}</strong></p>
 
             <div className="flex justify-end gap-4 mt-4">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">
-                Cancelar
-              </button>
               <button
                 onClick={() => {
                   handleRepoDownload(tokenEstimation.repo); // novo nome da função original
@@ -173,6 +170,9 @@ export function Upload() {
                 className="px-4 py-2 bg-blue-600 text-white rounded"
               >
                 Confirmar Análise
+              </button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">
+                Cancelar
               </button>
             </div>
           </div>
