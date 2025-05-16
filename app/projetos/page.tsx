@@ -23,6 +23,10 @@ export default function Page() {
     const [previewMessage, setPreviewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const entries = currentProjectFolder && Object.entries(currentProjectFolder);
+    const files = entries?.filter(([_, value]: any[]) => value.extension);
+    const folders = entries?.filter(([_, value]: any[]) => !value.extension);
+
     async function getData() {
         const dbRef = ref(db, user.uid)
 
@@ -155,26 +159,93 @@ export default function Page() {
                         </Card>
                     </div>
                 }
-                <div className="flex gap-4 flex-wrap">
+                <div className="flex gap-4 flex-wrap max-w-3xl justify-center">
                     {
                         !currentPath ? projects?.map((project, index) =>
-                            <Card key={index} onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
-                                {project}
-                            </Card>)
-                            : Object.entries(currentProjectFolder)?.map(([key, value]: any[], index) =>
-                                value.extension ?
-                                    <Card key={index} onClick={() => setDoc(value.content)} className="h-40 w-80 flex flex-col justify-center items-center cursor-pointer transition-all hover:scale-105 relative p-2 group">
-                                        <div>
-                                            <h3 className="font-semibold absolute top-0 start-2">{key + '.' + value.extension}</h3>
-                                            <p>{value.content.slice(0, 100)}</p>
+                            <div className="flex flex-col gap-2">
+                                <Card key={index} onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
+                                    {project}
+                                </Card>
+                                <Button onClick={() => chooseProject(project)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
+                            </div>
+                        )
+                            :
+                            <div className="flex justify-between gap-10">
+                                {files.length > 0 && (
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex gap-2">
+                                            <Image width={24} height={24} src="/files.svg" alt="Files svg" />
+                                            <h3>Arquivos</h3>
                                         </div>
-                                        <div className="absolute top-0 start-0 w-full h-full backdrop-blur-sm flex justify-center items-center opacity-0 group-hover:opacity-100">
-                                            <p className="uppercase font-semibold text-xl">Ver documentação</p>
+
+                                        <div className="flex flex-wrap gap-4">
+                                            {files.map(([key, value]: any[], index: number) => (
+                                                <Card
+                                                    key={index}
+                                                    onClick={() => setDoc(value.content)}
+                                                    className="h-40 w-80 flex flex-col justify-center items-center cursor-pointer transition-all hover:scale-105 relative p-2 group"
+                                                >
+                                                    <div>
+                                                        <h3 className="font-semibold absolute top-0 start-2">{key + '.' + value.extension}</h3>
+                                                        <p>{value.content.slice(0, 100)}</p>
+                                                    </div>
+                                                    <div className="absolute top-0 start-0 w-full h-full backdrop-blur-sm flex justify-center items-center opacity-0 group-hover:opacity-100">
+                                                        <p className="uppercase font-semibold text-xl">Ver documentação</p>
+                                                    </div>
+                                                </Card>
+                                            ))}
                                         </div>
-                                    </Card>
-                                    : <Card key={index} onClick={() => setCurrentPath(currentPath + "/" + key)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
-                                        {key}
-                                    </Card>)
+                                    </div>)}
+                                {folders.length > 0 && (
+                                    <div className="flex flex-col gap-2 mb-6">
+                                        <div className="flex gap-2">
+                                            <Image width={24} height={24} src="/folders.svg" alt="Folders svg" />
+                                            <h3>Pastas</h3>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-4">
+                                            {folders.map(([key]: any[], index: number) => (
+                                                <Card
+                                                    key={index}
+                                                    onClick={() => setCurrentPath(currentPath + "/" + key)}
+                                                    className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105"
+                                                >
+                                                    {key}
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                        // Object.entries(currentProjectFolder)?.map(([key, value]: any[], index) =>
+                        //     value.extension ?
+                        //         <div className="flex flex-col gap-2">
+                        //             <div className="flex gap-2">
+                        //                 <Image width={24} height={24} src="/files.svg" alt="File svg" />
+                        //                 <h3>Arquivos</h3>
+                        //             </div>
+                        //             <Card key={index} onClick={() => setDoc(value.content)} className="h-40 w-80 flex flex-col justify-center items-center cursor-pointer transition-all hover:scale-105 relative p-2 group">
+                        //                 <div>
+                        //                     <h3 className="font-semibold absolute top-0 start-2">{key + '.' + value.extension}</h3>
+                        //                     <p>{value.content.slice(0, 100)}</p>
+                        //                 </div>
+                        //                 <div className="absolute top-0 start-0 w-full h-full backdrop-blur-sm flex justify-center items-center opacity-0 group-hover:opacity-100">
+                        //                     <p className="uppercase font-semibold text-xl">Ver documentação</p>
+                        //                 </div>
+                        //             </Card>
+                        //         </div>
+                        //         :
+                        //         <div className="flex flex-col gap-2">
+                        //             <div className="flex gap-2">
+                        //                 <Image width={24} height={24} src="/folders.svg" alt="File svg" />
+                        //                 <h3>Pastas</h3>
+                        //             </div>
+                        //             <Card key={index} onClick={() => setCurrentPath(currentPath + "/" + key)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
+                        //                 {key}
+                        //             </Card>
+                        //         </div>
+                        // )
                     }
                 </div>
             </main>

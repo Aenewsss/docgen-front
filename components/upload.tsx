@@ -21,6 +21,31 @@ export function Upload() {
   const [file, setFile] = useState<File | null>(null)
   const [repos, setRepos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [documentName, setDocumentName] = useState("");
+  const [visibility, setVisibility] = useState("Público");
+  const [filteredRepos, setFilteredRepos] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const reposPerPage = 9;
+
+  // Cálculo de índices para a página atual
+  const indexOfLastRepo = currentPage * reposPerPage;
+  const indexOfFirstRepo = indexOfLastRepo - reposPerPage;
+  const currentRepos = filteredRepos.slice(indexOfFirstRepo, indexOfLastRepo);
+
+  const handleSearch = () => {
+    setIsLoading(true)
+    const lower = (str: string) => str.toLowerCase();
+
+    const result = repos.filter((el: any) => {
+      const matchesName = documentName === "" || lower(el.name).includes(lower(documentName));
+      const matchesVisibility = visibility === "Privado" ? el.private === true : el.private === false;
+
+      return matchesName && matchesVisibility;
+    });
+
+    setFilteredRepos(result);
+    setIsLoading(false)
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -76,6 +101,7 @@ export function Upload() {
     })).json()
 
     setRepos(response)
+    setFilteredRepos(response)
     setIsUploading(false)
   }
 
@@ -105,7 +131,7 @@ export function Upload() {
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto mb-16">
+    <Card className="w-full max-w-6xl mx-auto mb-16">
       {user && <div className="flex justify-center mt-4">
         <Link href="/projetos"><Button>Acessar meus projetos</Button></Link>
       </div>}
@@ -136,13 +162,75 @@ export function Upload() {
               </div>
             ) : repos.length ? (
               <div className="flex flex-wrap gap-4 justify-center">
-                {repos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="flex flex-col items-center justify-center space-y-4 w-1/2 max-w-[300px]">
+                <div className="bg-gray-100 rounded-xl p-6 w-full">
+                  <h2 className="text-xl font-semibold mb-4 text-start">Buscar Documento</h2>
+                  <div className="flex gap-2 justify-between">
+
+                    <div className="flex gap-4 w-full">
+                      <input
+                        type="text"
+                        placeholder="Nome do Documento"
+                        className="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm placeholder-gray-500 w-full"
+                        value={documentName}
+                        onChange={(e) => setDocumentName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSearch(); // sua função de busca
+                          }
+                        }}
+                      />
+
+                      <select
+                        className="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm text-black"
+                        value={visibility}
+                        onChange={(e) => setVisibility(e.target.value)}
+                      >
+                        <option selected>Tipo do repositório</option>
+                        <option value={'Público'}>Público</option>
+                        <option value={'Privado'}>Privado</option>
+                      </select>
+
+                      {/* <select
+                      className="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm text-black w-24"
+                    >
+                      <option selected>Proprietário</option>
+                      <option>Sim</option>
+                      <option>Não</option>
+                    </select> */}
+                    </div>
+                    <button onClick={handleSearch} className="bg-black text-white px-6 py-2 rounded-md text-sm hover:opacity-90 transition">Buscar</button>
+                  </div>
+                </div>
+                {currentRepos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="flex flex-col items-center justify-center space-y-4 w-1/2 max-w-[300px]">
                   <FileArchive className="h-12 w-12 text-primary" />
                   <div className="space-y-2">
                     <h3 className="text-x font-medium">{el.name}</h3>
                     <a target="_blank" href={el.clone_url}><p className="text-muted-foreground">link do repo</p></a>
                   </div>
                 </div>)}
+                <div className="flex justify-center gap-4 mt-6 w-full">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                  >
+                    Anterior
+                  </button>
+
+                  <span className="self-center">Página {currentPage}</span>
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        indexOfLastRepo < filteredRepos.length ? prev + 1 : prev
+                      )
+                    }
+                    disabled={indexOfLastRepo >= filteredRepos.length}
+                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                  >
+                    Próxima
+                  </button>
+                </div>
               </div>
             ) : (
               <div onClick={connectGithub} className="flex flex-col items-center justify-center space-y-4 cursor-pointer">
