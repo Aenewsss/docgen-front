@@ -15,7 +15,7 @@ export function Upload() {
   const searchParams = useSearchParams()
 
   const { user } = useAuth()
-  console.log(user)
+
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
@@ -161,20 +161,34 @@ export function Upload() {
             <p className="mb-2">Tokens estimados: <strong>{tokenEstimation.estimated_tokens.toLocaleString('pt-BR')}</strong></p>
             <p className="mb-4">Custo estimado: <strong>R$ {tokenEstimation.estimated_cost_brl.toLocaleString('pt-BR')}</strong></p>
 
-            <div className="flex justify-end gap-4 mt-4">
-              <button
-                onClick={() => {
-                  handleRepoDownload(tokenEstimation.repo); // novo nome da função original
-                  setShowModal(false);
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
-              >
-                Confirmar Análise
-              </button>
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">
-                Cancelar
-              </button>
-            </div>
+            {
+              tokenEstimation.estimated_tokens.toLocaleString('pt-BR') > user.credits
+                ?
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                  }}
+                  className="px-4 py-2 bg-amber-400 text-white rounded"
+                >
+                  Limite de créditos atingido
+                </button>
+                :
+                <div className="flex justify-end gap-4 mt-4">
+                  <button
+                    onClick={() => {
+                      handleRepoDownload(tokenEstimation.repo); // novo nome da função original
+                      setShowModal(false);
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                  >
+                    Confirmar Análise
+                  </button>
+                  <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">
+                    Cancelar
+                  </button>
+                </div>
+            }
+
           </div>
         </div>
       )}
