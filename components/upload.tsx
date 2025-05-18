@@ -33,7 +33,7 @@ export function Upload() {
   // Cálculo de índices para a página atual
   const indexOfLastRepo = currentPage * reposPerPage;
   const indexOfFirstRepo = indexOfLastRepo - reposPerPage;
-  const currentRepos = filteredRepos.slice(indexOfFirstRepo, indexOfLastRepo);
+  const currentRepos = Array.isArray(filteredRepos) && filteredRepos.slice(indexOfFirstRepo, indexOfLastRepo) || [];
 
   const handleSearch = () => {
     setIsLoading(true)

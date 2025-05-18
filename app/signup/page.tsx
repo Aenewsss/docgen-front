@@ -1,17 +1,31 @@
 "use client"
 
 import { Header } from "@/components/header";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth"
-import { auth } from "@/firebase/config";
+import { auth, db } from "@/firebase/config";
 import { Button } from "@/components/ui/button";
+import { ref, set } from "firebase/database";
 
 export default function Page() {
 
     const router = useRouter()
+    const searchParams = useSearchParams()
 
-    const [loginData, setLoginData] = useState({ email: '', password: '', repeatPassword: '', name: '', company: '', phone: '', country: '', city: '', role: '' });
+    const [loginData, setLoginData] = useState({
+        email: '', password: '', repeatPassword: '',
+        name: '', company: '', phone: '', country: '',
+        city: '', role: '', plan: '', billingCycle: ''
+    });
+
+    useEffect(() => {
+        if (!searchParams.get("plan") && !searchParams.get("billingCycle")) {
+            router.push('/pricing')
+        } else {
+            setLoginData({ ...loginData, plan: searchParams.get("plan")!, billingCycle: searchParams.get("billingCycle")! })
+        }
+    }, [searchParams]);
 
     function handleSignup() {
 
@@ -24,7 +38,18 @@ export default function Page() {
         createUserWithEmailAndPassword(auth, loginData.email, loginData.password)
             .then(result => {
                 // @ts-ignore
-                localStorage.setItem('jwt-docgen',result.user.accessToken)
+                localStorage.setItem('jwt-docgen', result.user.accessToken)
+                const dbRef = ref(db, `users/${result.user.uid}`)
+
+                set(dbRef, {
+                    ...loginData,
+                    email: result.user.email,
+                    isTrial: true,
+                    trialDateEnd: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
+                    credits: 30000,
+                    creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
+                })
+
                 router.push("/")
             })
             .catch(e => alert(`Erro ao tentar criar conta: ${e.message}`))

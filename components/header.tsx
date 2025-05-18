@@ -25,12 +25,14 @@ export function Header() {
           <Link href="#examples" className="text-sm font-medium hover:underline underline-offset-4">
             Exemplos
           </Link>
-          <Link href="#pricing" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/pricing" className="text-sm font-medium hover:underline underline-offset-4">
             Preços
           </Link>
         </nav>
         {user
           ? <div className="flex items-center gap-2">
+            {/* @ts-ignore */}
+            {user.credits && <Button className="cursor-auto hover:bg-white" variant="ghost" >🪙 Créditos: <span className="font-semibold">{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
             <Button className="cursor-auto hover:bg-white" variant="ghost" >{user.email}</Button>
             <Button onClick={logout} variant="destructive">Sair</Button>
           </div>
@@ -39,7 +41,7 @@ export function Header() {
               <Link href="/login">Entrar</Link>
             </Button>
             <Button asChild>
-              <Link href="/signup">Cadastrar</Link>
+              <Link href="/pricing">Cadastrar</Link>
             </Button>
           </div>}
       </div>
