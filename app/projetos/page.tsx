@@ -28,7 +28,7 @@ export default function Page() {
     const folders = entries?.filter(([_, value]: any[]) => !value.extension);
 
     async function getData() {
-        const dbRef = ref(db, user.uid)
+        const dbRef = ref(db, `documentations/${user.uid}`)
 
         const result = await get(dbRef)
 
