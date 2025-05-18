@@ -1,6 +1,6 @@
 import { auth, db } from "@/firebase/config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { get, ref } from "firebase/database";
+import { get, ref, onValue, off } from "firebase/database";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,17 +11,31 @@ export function useAuth() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            const userRef = ref(db, `/users/${currentUser?.uid}`)
+        let userRef: ReturnType<typeof ref> | null = null;
 
-            get(userRef)
-                .then(result => {
-                    if (result.val()) setUser({ ...currentUser, ...result.val() });
-                })
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                userRef = ref(db, `/users/${currentUser.uid}`);
+
+                // Escuta atualizações em tempo real no Firebase
+                onValue(userRef, (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        setUser({ ...currentUser, ...userData });
+                    }
+                });
+            } else {
+                setUser(null);
+            }
+
             setLoading(false);
         });
 
-        return () => unsubscribe();
+        // Limpa a escuta quando o componente for desmontado ou o usuário mudar
+        return () => {
+            if (userRef) off(userRef);
+            unsubscribe();
+        };
     }, []);
 
     function logout() {

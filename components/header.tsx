@@ -32,7 +32,7 @@ export function Header() {
         {user
           ? <div className="flex items-center gap-2">
             {/* @ts-ignore */}
-            {user.credits && <Button className="cursor-auto hover:bg-white" variant="ghost" >🪙 Créditos: <span className="font-semibold">{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
+            {user.credits && <Button className="cursor-auto hover:bg-white" variant="ghost" >🪙 Créditos: <span className={`font-semibold ${Number(user.credits) < 0 ? 'text-red-500' : 'text-black'}`}>{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
             <Button className="cursor-auto hover:bg-white" variant="ghost" >{user.email}</Button>
             <Button onClick={logout} variant="destructive">Sair</Button>
           </div>
