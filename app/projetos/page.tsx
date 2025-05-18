@@ -40,23 +40,23 @@ export default function Page() {
     }
 
     useEffect(() => {
-        getData()
+        user?.uid && getData()
     }, [user]);
 
     useEffect(() => {
-        chooseProject()
+        user?.uid && chooseProject()
     }, [currentPath]);
 
     async function chooseProject(project?: string) {
-        const path = currentPath || `${user.uid}/${project}`
+        console.log(project)
+        const path = 'documentations/' + (currentPath || `${user.uid}/${project}`)
         const dbRef = ref(db, path)
 
         const result = await get(dbRef)
         if (result.exists()) {
             const data = result.val()
-
             setCurrentProjectFolder(data)
-            !currentPath && setCurrentPath(path)
+            !currentPath && setCurrentPath(path.includes('documentations') ? path.split('/').slice(1).join('/') : path)
         }
     }
 
@@ -162,8 +162,8 @@ export default function Page() {
                 <div className="flex gap-4 flex-wrap max-w-3xl justify-center">
                     {
                         !currentPath ? projects?.map((project, index) =>
-                            <div className="flex flex-col gap-2">
-                                <Card key={index} onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
+                            <div key={index} className="flex flex-col gap-2">
+                                <Card onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
                                     {project}
                                 </Card>
                                 <Button onClick={() => chooseProject(project)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
