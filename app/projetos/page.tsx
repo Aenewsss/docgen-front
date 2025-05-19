@@ -25,7 +25,7 @@ export default function Page() {
 
     const entries = currentProjectFolder && Object.entries(currentProjectFolder);
     const files = entries?.filter(([_, value]: any[]) => value.extension);
-    const folders = entries?.filter(([_, value]: any[]) => !value.extension);
+    const folders = entries?.filter(([key, value]: any[]) => !value.extension && key != 'summary');
 
     async function getData() {
         const dbRef = ref(db, `documentations/${user.uid}`)
