@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
-import { get, ref } from "firebase/database";
+import { get, onValue, push, ref } from "firebase/database";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,12 +72,42 @@ export default function Page() {
             })
         })).json()
 
-        console.log(response)
+        const userMessage = { text: newMessage, fromAI: false }
+        const aiMessage = { text: response.output, fromAI: true }
 
         setPreviewMessage('')
-        setMessages([...messages, ...[{ text: newMessage, fromAI: false }, { text: response.output, fromAI: true }]])
+        setMessages(prev => [...prev, userMessage, aiMessage])
         setIsLoading(false)
+
+        // 🔥 Salvar no Firebase
+        const chatRef = ref(db, `chats/${user.uid}/${currentPath.split('/')[1]}`)
+        await push(chatRef, {
+            userMessage: userMessage.text,
+            aiMessage: aiMessage.text,
+            createdAt: new Date().toISOString()
+        })
     }
+
+    useEffect(() => {
+        if (!user || !currentPath) return;
+
+        const projectName = currentPath.split("/")[1];
+        const chatRef = ref(db, `chats/${user.uid}/${projectName}`);
+
+        const unsubscribe = onValue(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const formatted = Object.values(data).map((entry: any) => ([
+                    { text: entry.userMessage, fromAI: false },
+                    { text: entry.aiMessage, fromAI: true }
+                ])).flat();
+
+                setMessages(formatted);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [user, currentPath]);
 
     return (
         <div className="min-h-screen flex flex-col">
