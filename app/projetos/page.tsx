@@ -164,6 +164,9 @@ export default function Page() {
                                 className="flex-1 px-4 py-2 border rounded-md shadow-sm"
                                 value={newMessage}
                                 onChange={(e: any) => setNewMessage(e.target.value)}
+                                onKeyDown={e => {
+                                    if (!isLoading && e.key == 'Enter') sendNewMessage()
+                                }}
                             />
                             <Button onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-white" /> : 'Enviar'}</Button>
                         </div>
