@@ -22,6 +22,7 @@ export default function Page() {
     const [newMessage, setNewMessage] = useState('');
     const [previewMessage, setPreviewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [readmeIsLoading, setReadmeIsLoading] = useState(false);
 
     const entries = currentProjectFolder && Object.entries(currentProjectFolder);
     const files = entries?.filter(([_, value]: any[]) => value.extension);
@@ -57,6 +58,38 @@ export default function Page() {
             const data = result.val()
             setCurrentProjectFolder(data)
             !currentPath && setCurrentPath(path.includes('documentations') ? path.split('/').slice(1).join('/') : path)
+        }
+    }
+
+    async function generateReadme() {
+        setReadmeIsLoading(true)
+        try {
+            const response = await (await fetch(`${process.env.NEXT_PUBLIC_N8N_README}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    project: currentPath.split('/')[1],
+                    user: user.uid
+                })
+            })).json()
+
+            const markdownContent = response.data
+
+            // Cria um blob do conteúdo .md
+            const blob = new Blob([markdownContent], { type: 'text/markdown' })
+            const url = URL.createObjectURL(blob)
+
+            // Cria e clica num link invisível
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `${currentPath.split('/')[1] || 'README'}.md`
+            a.click()
+
+            // Libera a memória
+            URL.revokeObjectURL(url)
+        } catch (e: any) {
+            alert(`Erro: ${e.message}`)
+        } finally {
+            setReadmeIsLoading(false)
         }
     }
 
@@ -249,36 +282,13 @@ export default function Page() {
                                         </div>
                                     </div>
                                 )}
-                            </div>
-
-                        // Object.entries(currentProjectFolder)?.map(([key, value]: any[], index) =>
-                        //     value.extension ?
-                        //         <div className="flex flex-col gap-2">
-                        //             <div className="flex gap-2">
-                        //                 <Image width={24} height={24} src="/files.svg" alt="File svg" />
-                        //                 <h3>Arquivos</h3>
-                        //             </div>
-                        //             <Card key={index} onClick={() => setDoc(value.content)} className="h-40 w-80 flex flex-col justify-center items-center cursor-pointer transition-all hover:scale-105 relative p-2 group">
-                        //                 <div>
-                        //                     <h3 className="font-semibold absolute top-0 start-2">{key + '.' + value.extension}</h3>
-                        //                     <p>{value.content.slice(0, 100)}</p>
-                        //                 </div>
-                        //                 <div className="absolute top-0 start-0 w-full h-full backdrop-blur-sm flex justify-center items-center opacity-0 group-hover:opacity-100">
-                        //                     <p className="uppercase font-semibold text-xl">Ver documentação</p>
-                        //                 </div>
-                        //             </Card>
-                        //         </div>
-                        //         :
-                        //         <div className="flex flex-col gap-2">
-                        //             <div className="flex gap-2">
-                        //                 <Image width={24} height={24} src="/folders.svg" alt="File svg" />
-                        //                 <h3>Pastas</h3>
-                        //             </div>
-                        //             <Card key={index} onClick={() => setCurrentPath(currentPath + "/" + key)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
-                        //                 {key}
-                        //             </Card>
-                        //         </div>
-                        // )
+                            </div>}
+                    {
+                        currentPath &&
+                        <Button disabled={readmeIsLoading} onClick={generateReadme} variant="outline" className="fixed bottom-10 right-10">
+                            Gerar README.md
+                            {readmeIsLoading && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
+                        </Button>
                     }
                 </div>
             </main>
