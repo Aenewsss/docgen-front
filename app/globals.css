@@ -96,3 +96,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.bounce-custom {
+  @apply animate-bounce;
+  animation-duration: 5s; /* sobrescreve */
+  animation-timing-function: ease;
+}

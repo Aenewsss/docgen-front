@@ -32,7 +32,7 @@ export function PricingPlans() {
       limitations: [
         "Acesso antecipado ao roadmap de features",
       ],
-      cta: "Iniciar Teste Gratuito",
+      cta: "Assinar",
       popular: false,
     },
     {
@@ -56,7 +56,7 @@ export function PricingPlans() {
       ],
       limitations: [
       ],
-      cta: "Iniciar Teste Gratuito",
+      cta: "Assinar",
       popular: true,
     },
     {
@@ -79,7 +79,7 @@ export function PricingPlans() {
         "Acesso antecipado ao roadmap de features",
       ],
       limitations: [],
-      cta: "Iniciar Teste Gratuito",
+      cta: "Assinar",
       popular: false,
     },
   ]
@@ -111,7 +111,7 @@ export function PricingPlans() {
         {plans.map((plan) => (
           <Card
             key={plan.name}
-            className={`flex flex-col ${plan.popular ? "border-primary shadow-md relative md:scale-105" : ""}`}
+            className={`flex flex-col ${plan.popular ? "border-primary shadow-lg shadow-black animate-in relative md:scale-105" : ""}`}
           >
             {plan.popular && (
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

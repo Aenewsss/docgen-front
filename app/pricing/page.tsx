@@ -1,5 +1,7 @@
 import { Header } from "@/components/header"
 import { PricingPlans } from "@/components/pricing-plans"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default function PricingPage() {
   return (
@@ -9,6 +11,11 @@ export default function PricingPage() {
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Planos e Preços</h1>
           <p className="text-xl text-muted-foreground">Escolha o plano ideal para suas necessidades de documentação</p>
+          <Link href={`/signup?plan=free`}>
+            <Button className="mt-4" variant={"outline"}>
+              Teste nossa ferramenta com<span className="text-green-600 -ms-1 font-semibold">30.000 créditos grátis</span>
+            </Button>
+          </Link>
         </div>
         <PricingPlans />
         <div className="mt-16 max-w-3xl mx-auto text-center">

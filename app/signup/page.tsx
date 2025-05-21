@@ -20,11 +20,7 @@ function SignupForm() {
     });
 
     useEffect(() => {
-        if (!searchParams.get("plan") && !searchParams.get("billingCycle")) {
-            router.push('/pricing')
-        } else {
-            setLoginData({ ...loginData, plan: searchParams.get("plan")!, billingCycle: searchParams.get("billingCycle")! })
-        }
+        setLoginData({ ...loginData, plan: searchParams.get("plan") || '', billingCycle: searchParams.get("billingCycle") || '' })
     }, [searchParams]);
 
     function handleSignup() {
@@ -50,9 +46,29 @@ function SignupForm() {
                     creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
                 })
 
-                router.push("/")
+                loginData.plan == 'free' ? router.push("/") : router.push("/pricing")
             })
             .catch(e => alert(`Erro ao tentar criar conta: ${e.message}`))
+    }
+
+    function formatPhone(value: string): string {
+        const digits = value.replace(/\D/g, '')
+
+        if (digits.length <= 2) {
+            return `(${digits}`
+        } else if (digits.length <= 6) {
+            return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+        } else if (digits.length <= 10) {
+            return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+        } else {
+            return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
+        }
+    }
+
+
+    const handleChangePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhone(e.target.value)
+        setLoginData({...loginData, phone: formatted})
     }
 
     return (
@@ -87,13 +103,12 @@ function SignupForm() {
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Telefone*</label>
-                <input value={loginData.phone} onChange={(e: any) => setLoginData({ ...loginData, phone: e.target.value })} className="border rounded-md p-2" type="tel" />
+                <input value={loginData.phone} onChange={handleChangePhone} className="border rounded-md p-2" type="tel" />
             </div>
             <Button type="button" onClick={handleSignup} className="w-full" variant="default">Cadastrar</Button>
         </form>
     )
 }
-
 
 export default function Page() {
     return (

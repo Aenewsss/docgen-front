@@ -145,77 +145,87 @@ export default function Page() {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-                <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
-                    <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                        Meu projetos
-                    </h1>
-                    <p className="text-xl text-muted-foreground">
-                        Aqui estarão listados seus projetos com uma documentação completa e organizada
-                    </p>
-                    {currentPath && <div className="w-full max-w-3xl border rounded-lg p-4 mb-12 shadow-md">
-                        <h2 className="text-xl font-semibold mb-0">Converse com a IA DocGen</h2>
-                        <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
-                        <div className="bg-muted-foreground/10 rounded-md p-4 space-y-4 max-h-[400px] overflow-y-auto">
-                            <div className="flex gap-2 items-start">
-                                <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
-                                    <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
-                                </div>
-                                <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                    Olá! Como posso te ajudar com seu projeto?
-                                </p>
-                            </div>
-                            {
-                                messages.map((message, index) =>
-                                    message.fromAI ? <div key={index} className="flex gap-2 items-start">
-                                        <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
-                                            <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
-                                        </div>
-                                        <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
-                                            <ReactMarkdown>{message.text}</ReactMarkdown>
-                                        </p>
+            <main className={`flex-1 flex flex-col items-center justify-center ${projects.length ? `px-4 py-12` : `-mt-20`}`}>
+                {projects.length ?
+                    <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
+                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+                            Meu projetos
+                        </h1>
+                        <p className="text-xl text-muted-foreground">
+                            Aqui estarão listados seus projetos com uma documentação completa e organizada
+                        </p>
+
+                        {currentPath && <div className="w-full max-w-3xl border rounded-lg p-4 mb-12 shadow-md">
+                            <h2 className="text-xl font-semibold mb-0">Converse com a IA DocGen</h2>
+                            <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
+                            <div className="bg-muted-foreground/10 rounded-md p-4 space-y-4 max-h-[400px] overflow-y-auto">
+                                <div className="flex gap-2 items-start">
+                                    <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
+                                        <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
                                     </div>
-                                        : <div className="flex gap-2 items-start justify-end">
-                                            <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                                {message.text}
-                                            </p>
-                                        </div>
-                                )
-                            }
-                            {
-                                previewMessage && <div className="flex gap-2 items-start justify-end">
-                                    <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                        {previewMessage}
+                                    <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                        Olá! Como posso te ajudar com seu projeto?
                                     </p>
                                 </div>
-                            }
-                        </div>
-                        <div className="mt-4 flex gap-2">
-                            <input
-                                type="text"
-                                placeholder="Digite sua mensagem..."
-                                className="flex-1 px-4 py-2 border rounded-md shadow-sm"
-                                value={newMessage}
-                                onChange={(e: any) => setNewMessage(e.target.value)}
-                                onKeyDown={e => {
-                                    if (!isLoading && e.key == 'Enter') sendNewMessage()
-                                }}
-                            />
-                            <Button onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-white" /> : 'Enviar'}</Button>
-                        </div>
-                    </div>}
-                    <div className="text-start flex gap-2">
-                        {currentPath && <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>}
-                        {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
-                            <span onClick={() => {
-                                if (index < arr.length - 1) {
-                                    console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
-                                    setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
+                                {
+                                    messages.map((message, index) =>
+                                        message.fromAI ? <div key={index} className="flex gap-2 items-start">
+                                            <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
+                                                <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
+                                            </div>
+                                            <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
+                                                <ReactMarkdown>{message.text}</ReactMarkdown>
+                                            </p>
+                                        </div>
+                                            : <div className="flex gap-2 items-start justify-end">
+                                                <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                                    {message.text}
+                                                </p>
+                                            </div>
+                                    )
                                 }
-                            }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
-                        )}
+                                {
+                                    previewMessage && <div className="flex gap-2 items-start justify-end">
+                                        <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                            {previewMessage}
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                            <div className="mt-4 flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Digite sua mensagem..."
+                                    className="flex-1 px-4 py-2 border rounded-md shadow-sm"
+                                    value={newMessage}
+                                    onChange={(e: any) => setNewMessage(e.target.value)}
+                                    onKeyDown={e => {
+                                        if (!isLoading && e.key == 'Enter') sendNewMessage()
+                                    }}
+                                />
+                                <Button onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-white" /> : 'Enviar'}</Button>
+                            </div>
+                        </div>}
+                        {currentPath && <div className="text-start flex gap-2">
+                            <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>
+                            {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
+                                <span onClick={() => {
+                                    if (index < arr.length - 1) {
+                                        console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
+                                        setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
+                                    }
+                                }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
+                            )}
+                        </div>}
                     </div>
-                </div>
+                    : <div className="relative flex items-center justify-center">
+                        <Image className="w-screen h-full max-h-screen object-cover" width={300} height={300} src="/empty-state-docgen-projects.jpg" alt="Empty State" />
+                        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20"></div>
+
+                        <h1 className="absolute text-4xl text-white p-2 z-10 shadow-black shadow-lg font-bold tracking-tight sm:text-5xl md:text-6xl">Nenhum projeto disponível</h1>
+                        <Link className="absolute text-lg mt-32  transition-all hover:backdrop-blur-lg hover:scale-105 text-white p-2 z-10 shadow-black shadow-lg font-bold tracking-tight" href="/">Selecionar projeto</Link>
+                    </div>
+                }
                 {
                     doc && <div className="fixed top-0 start-0 w-screen h-screen z-50 flex justify-center items-center">
                         <div className="absolute w-full h-full backdrop-blur-md" onClick={() => setDoc('')}></div>
@@ -292,9 +302,9 @@ export default function Page() {
                     }
                 </div>
             </main>
-            <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-                <p className="text-center text-sm text-muted-foreground">© 2025 DocGen. Todos os direitos reservados.
-                    <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
+            <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length && `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4`}`}>
+                <p className={`text-center text-sm ${!projects.length ? `text-white` : `text-muted-foreground`}`}>© 2025 DocGen. Todos os direitos reservados.
+                    <a className={`underline ${!projects.length ? `text-white` : `text-black`}`} href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
                 </p>
             </footer>
         </div>

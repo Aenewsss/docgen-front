@@ -97,15 +97,20 @@ export function Upload() {
 
   async function getReposData(token?: string) {
     setIsUploading(true)
-    const response = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/repos`, {
-      headers: {
-        Authorization: `Bearer ${token || localStorage.getItem('github_token')}`,
-      },
-    })).json()
+    try {
+      const response = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/repos`, {
+        headers: {
+          Authorization: `Bearer ${token || localStorage.getItem('github_token')}`,
+        },
+      })).json()
 
-    setRepos(response)
-    setFilteredRepos(response)
-    setIsUploading(false)
+      setRepos(response)
+      setFilteredRepos(response)
+  } catch (error: any) {
+      console.error(error.message)
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   useEffect(() => {
