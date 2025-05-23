@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown"
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Page() {
 
@@ -72,34 +73,18 @@ export default function Page() {
     }
 
     async function generateReadme() {
-        setReadmeIsLoading(true)
         try {
-            const response = await (await fetch(`${process.env.NEXT_PUBLIC_N8N_README}`, {
+            toast("O README será enviado por email!", {position: 'bottom-center'});
+            fetch(`${process.env.NEXT_PUBLIC_N8N_README}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     project: currentPath.split('/')[1],
-                    user: user.uid
+                    user: user.uid,
+                    userEmail: user.email
                 })
-            })).json()
-
-            const markdownContent = response.data
-
-            // Cria um blob do conteúdo .md
-            const blob = new Blob([markdownContent], { type: 'text/markdown' })
-            const url = URL.createObjectURL(blob)
-
-            // Cria e clica num link invisível
-            const a = document.createElement('a')
-            a.href = url
-            a.download = `${currentPath.split('/')[1] || 'README'}.md`
-            a.click()
-
-            // Libera a memória
-            URL.revokeObjectURL(url)
+            })
         } catch (e: any) {
-            alert(`Erro: ${e.message}`)
-        } finally {
-            setReadmeIsLoading(false)
+            console.log(e.message)
         }
     }
 
@@ -308,7 +293,7 @@ export default function Page() {
                     </div>
                 }
                 {
-                    doc && <div className="fixed top-0 start-0 w-screen h-screen z-50 flex justify-center items-center">
+                    doc && <div className="fixed top-0 start-0 w-screen h-screen z-[60] flex justify-center items-center">
                         <div className="absolute w-full h-full backdrop-blur-md" onClick={() => setDoc('')}></div>
                         <Card className="absolute z-10 h-[90%] w-[600px] p-4 pt-10 overflow-auto resize-x">
                             <ReactMarkdown>{doc}</ReactMarkdown>
@@ -322,6 +307,7 @@ export default function Page() {
                     <a className={`underline text-white`} href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
                 </p>
             </footer>
+            <ToastContainer />
         </div>
     )
 }
