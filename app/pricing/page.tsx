@@ -1,9 +1,15 @@
+'use client'
+
 import { Header } from "@/components/header"
 import { PricingPlans } from "@/components/pricing-plans"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/hooks/use-auth"
 import Link from "next/link"
 
 export default function PricingPage() {
+
+  const { loading, user } = useAuth()
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -11,11 +17,11 @@ export default function PricingPage() {
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Planos e Preços</h1>
           <p className="text-xl text-muted-foreground">Escolha o plano ideal para suas necessidades de documentação</p>
-          <Link href={`/signup?plan=free`}>
+          {!loading && !user && <Link href={`/signup?plan=free`}>
             <Button className="mt-4" variant={"outline"}>
               Teste nossa ferramenta com<span className="text-green-600 -ms-1 font-semibold">30.000 créditos grátis</span>
             </Button>
-          </Link>
+          </Link>}
         </div>
         <PricingPlans />
         <div className="mt-16 max-w-3xl mx-auto text-center">
@@ -48,7 +54,7 @@ export default function PricingPage() {
       </main>
       <footer className="border-t py-6 md:py-8">
         <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8">
-          <p className="text-center text-sm text-muted-foreground">© 2025 DocGen. Todos os direitos reservados.</p>
+          <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>

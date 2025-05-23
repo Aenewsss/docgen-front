@@ -1,10 +1,26 @@
+'use client'
 import { Upload } from "@/components/upload"
 import { Features } from "@/components/features"
 import { Examples } from "@/components/examples"
 import { Header } from "@/components/header"
-import { Suspense } from "react"
+import { Suspense, useEffect } from "react"
+import { useAuth } from "@/hooks/use-auth"
+import { usePathname, useRouter } from "next/navigation"
+import { Loader2 } from "lucide-react"
+import CongratsModal from "@/components/congrats-modal"
+import Loading from "@/components/loading"
 
 export default function Home() {
+  const { loading, user, logout } = useAuth()
+  const pathname = usePathname()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && user && !user?.plan) router.push('/pricing')
+  }, [user, pathname, loading]);
+
+  if (loading) return <Loading />
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -21,11 +37,13 @@ export default function Home() {
           <Upload />
         </Suspense>
 
+        <CongratsModal loading={loading} user={user} />
+
         <Features />
         <Examples />
       </main>
       <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-        <p className="text-center text-sm text-muted-foreground">© 2025 DocGen. Todos os direitos reservados.
+        <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.
           <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
         </p>
       </footer>

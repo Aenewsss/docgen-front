@@ -102,3 +102,12 @@ body {
   animation-duration: 5s; /* sobrescreve */
   animation-timing-function: ease;
 }
+
+::-webkit-scrollbar {
+  background-color: black;
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: rgb(30,30,30);
+}

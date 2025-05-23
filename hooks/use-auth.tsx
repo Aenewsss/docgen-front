@@ -22,13 +22,14 @@ export function useAuth() {
                     const userData = snapshot.val();
                     if (userData) {
                         setUser({ ...currentUser, ...userData });
+                        setLoading(false);
                     }
                 });
             } else {
                 setUser(null);
+                setLoading(false);
             }
 
-            setLoading(false);
         });
 
         // Limpa a escuta quando o componente for desmontado ou o usuário mudar

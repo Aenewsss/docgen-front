@@ -1,5 +1,6 @@
 'use client'
 import { Header } from "@/components/header";
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/firebase/config";
@@ -8,12 +9,12 @@ import { get, onValue, push, ref } from "firebase/database";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown"
 
 export default function Page() {
 
-    const { user } = useAuth()
+    const { loading, user } = useAuth()
     const [projects, setProjects] = useState<string[]>([]);
     const [currentProjectFolder, setCurrentProjectFolder] = useState<any>();
     const [currentPath, setCurrentPath] = useState('');
@@ -23,12 +24,20 @@ export default function Page() {
     const [previewMessage, setPreviewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [readmeIsLoading, setReadmeIsLoading] = useState(false);
+    const [projectsLoading, setProjectsLoading] = useState(false);
+
+    const messagesEndRef = useRef<HTMLDivElement | null>(null)
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
 
     const entries = currentProjectFolder && Object.entries(currentProjectFolder);
     const files = entries?.filter(([_, value]: any[]) => value.extension);
     const folders = entries?.filter(([key, value]: any[]) => !value.extension && key != 'summary');
 
     async function getData() {
+        setProjectsLoading(true)
         const dbRef = ref(db, `documentations/${user.uid}`)
 
         const result = await get(dbRef)
@@ -38,6 +47,7 @@ export default function Page() {
 
             setProjects(Object.keys(data))
         }
+        setProjectsLoading(false)
     }
 
     useEffect(() => {
@@ -97,6 +107,7 @@ export default function Page() {
         setPreviewMessage(newMessage)
         setNewMessage('')
         setIsLoading(true)
+        scrollToBottom()
         const response = await (await fetch(`${process.env.NEXT_PUBLIC_N8N_CHAT}`, {
             method: 'POST',
             body: JSON.stringify({
@@ -119,6 +130,7 @@ export default function Page() {
             aiMessage: aiMessage.text,
             createdAt: new Date().toISOString()
         })
+        scrollToBottom()
     }
 
     useEffect(() => {
@@ -136,88 +148,157 @@ export default function Page() {
                 ])).flat();
 
                 setMessages(formatted);
+                scrollToBottom()
             }
         });
 
         return () => unsubscribe();
     }, [user, currentPath]);
 
+    if (loading || projectsLoading) return <Loading />
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className={`flex-1 flex flex-col items-center justify-center ${projects.length ? `px-4 py-12` : `-mt-20`}`}>
+            <main className={`flex-1 flex flex-col ${projects.length ? `` : `-mt-20`}`}>
                 {projects.length ?
-                    <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
-                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                            Meu projetos
-                        </h1>
-                        <p className="text-xl text-muted-foreground">
-                            Aqui estarão listados seus projetos com uma documentação completa e organizada
-                        </p>
-
-                        {currentPath && <div className="w-full max-w-3xl border rounded-lg p-4 mb-12 shadow-md">
-                            <h2 className="text-xl font-semibold mb-0">Converse com a IA DocGen</h2>
-                            <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
-                            <div className="bg-muted-foreground/10 rounded-md p-4 space-y-4 max-h-[400px] overflow-y-auto">
-                                <div className="flex gap-2 items-start">
-                                    <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
-                                        <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
-                                    </div>
-                                    <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                        Olá! Como posso te ajudar com seu projeto?
-                                    </p>
+                    !currentPath
+                        ? <section className="mt-20 w-full flex flex-col items-center">
+                            <h1 className="text-5xl font-semibold">Meus Projetos</h1>
+                            <p className="text-xl text-muted-foreground mb-6">Aqui estão listados todos seus projetos documentados.</p>
+                            {projects?.map((project, index) =>
+                                <div key={index} className="flex flex-col gap-2">
+                                    <Card onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
+                                        {project}
+                                    </Card>
+                                    <Button onClick={() => chooseProject(project)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
                                 </div>
-                                {
-                                    messages.map((message, index) =>
-                                        message.fromAI ? <div key={index} className="flex gap-2 items-start">
-                                            <div className="w-8 h-8 bg-gray-300 rounded-full flex justify-center items-center">
-                                                <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocGen Icon" />
+                            )}
+                        </section>
+                        : <div className="w-full flex gap-10 flex-1">
+                            {/* DocumentAI Chat */}
+                            <div className="p-4 text-start w-1/2 shadow-md flex-1 flex flex-col justify-between bg-black">
+                                <div className="flex flex-col">
+                                    <h2 className="text-xl font-semibold mb-0 text-white">Converse com a DocumentAI</h2>
+                                    <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
+                                    <div className=" py-4 border-t border-[rgb(30,30,30)] space-y-4 h-[calc(100vh-300px)] overflow-y-auto">
+                                        <div className="flex gap-2 items-start">
+                                            <div className="w-10 h-10 bg-[rgb(30,30,30)] rounded-full flex justify-center items-center">
+                                                <Image className="w-[60%] h-[60%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocumentAI Icon" />
                                             </div>
-                                            <p className="bg-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
-                                                <ReactMarkdown>{message.text}</ReactMarkdown>
+                                            <p className="bg-[rgb(30,30,30)] p-3 rounded-lg shadow-[rgb(40,40,40)] shadow-md max-w-[80%] text-white">
+                                                Olá! Como posso te ajudar com seu projeto?
                                             </p>
                                         </div>
-                                            : <div className="flex gap-2 items-start justify-end">
+                                        {
+                                            messages.map((message, index) =>
+                                                message.fromAI ? <div key={index} className="flex gap-2 items-start">
+                                                    <div className="w-8 h-8 bg-[rgb(30,30,30)] rounded-full flex justify-center items-center">
+                                                        <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocumentAI Icon" />
+                                                    </div>
+                                                    <p className="bg-[rgb(30,30,30)] text-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
+                                                        <ReactMarkdown>{message.text}</ReactMarkdown>
+                                                    </p>
+                                                </div>
+                                                    :
+                                                    <div key={index} className="flex gap-2 items-start justify-end">
+                                                        <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                                            {message.text}
+                                                        </p>
+                                                    </div>
+                                            )
+                                        }
+                                        {
+                                            previewMessage && <div className="flex gap-2 items-start justify-end">
                                                 <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                                    {message.text}
+                                                    {previewMessage}
                                                 </p>
                                             </div>
-                                    )
-                                }
-                                {
-                                    previewMessage && <div className="flex gap-2 items-start justify-end">
-                                        <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                            {previewMessage}
-                                        </p>
+                                        }
+                                        <div ref={messagesEndRef} />
                                     </div>
-                                }
+                                </div>
+                                <div className="mt-4 flex gap-2 ">
+                                    <input
+                                        type="text"
+                                        placeholder="Digite sua mensagem..."
+                                        className="flex-1 px-4 py-2 border rounded-md shadow-sm bg-[rgba(20,20,20)] text-white outline-white"
+                                        value={newMessage}
+                                        onChange={(e: any) => setNewMessage(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (!isLoading && e.key == 'Enter') sendNewMessage()
+                                        }}
+                                    />
+                                    <Button variant={"outline"} onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-black" /> : 'Enviar'}</Button>
+                                </div>
                             </div>
-                            <div className="mt-4 flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Digite sua mensagem..."
-                                    className="flex-1 px-4 py-2 border rounded-md shadow-sm"
-                                    value={newMessage}
-                                    onChange={(e: any) => setNewMessage(e.target.value)}
-                                    onKeyDown={e => {
-                                        if (!isLoading && e.key == 'Enter') sendNewMessage()
-                                    }}
-                                />
-                                <Button onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-white" /> : 'Enviar'}</Button>
+                            <div className="flex flex-col gap-4 w-1/2 mt-10">
+                                {/* Mapa e projeto */}
+                                <Button disabled={readmeIsLoading} onClick={generateReadme} variant="outline" className="self-start">
+                                    Gerar README.md
+                                    {readmeIsLoading && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
+                                </Button>
+                                <div className="text-start flex gap-2">
+                                    <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>
+                                    {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
+                                        <span key={index} onClick={() => {
+                                            if (index < arr.length - 1) {
+                                                console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
+                                                setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
+                                            }
+                                        }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-between gap-10">
+                                    {files.length > 0 && (
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex gap-2">
+                                                <Image width={24} height={24} src="/files.svg" alt="Files svg" />
+                                                <h3>Arquivos</h3>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-4">
+                                                {files.map(([key, value]: any[], index: number) => (
+                                                    <Card
+                                                        key={index}
+                                                        onClick={() => setDoc(value.content)}
+                                                        className="h-32 xl:w-80 w-20 flex flex-col justify-center items-center cursor-pointer transition-all hover:scale-105 relative p-2 group"
+                                                    >
+                                                        <div className="w-full">
+                                                            <h3 className="font-semibold absolute top-0 start-2">{key + '.' + value.extension}</h3>
+                                                            <p className=" overflow-hidden xl:whitespace-normal whitespace-nowrap text-ellipsis">{value.content.slice(0, 100)}</p>
+                                                        </div>
+                                                        <div className="absolute top-0 start-0 w-full h-full backdrop-blur-sm flex justify-center items-center opacity-0 group-hover:opacity-100">
+                                                            <p className="uppercase font-semibold xl:text-xl">Ver documentação</p>
+                                                        </div>
+                                                    </Card>
+                                                ))}
+                                            </div>
+                                        </div>)}
+                                    {folders.length > 0 && (
+                                        <div className="flex flex-col gap-2 mb-6">
+                                            <div className="flex gap-2">
+                                                <Image width={24} height={24} src="/folders.svg" alt="Folders svg" />
+                                                <h3>Pastas</h3>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-4">
+                                                {folders.map(([key]: any[], index: number) => (
+                                                    <Card
+                                                        key={index}
+                                                        onClick={() => setCurrentPath(currentPath + "/" + key)}
+                                                        className="h-20 xl:w-80 w-20 flex justify-center items-center cursor-pointer transition-all hover:scale-105"
+                                                    >
+                                                        {key}
+                                                    </Card>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>}
-                        {currentPath && <div className="text-start flex gap-2">
-                            <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>
-                            {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
-                                <span onClick={() => {
-                                    if (index < arr.length - 1) {
-                                        console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
-                                        setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
-                                    }
-                                }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
-                            )}
-                        </div>}
-                    </div>
+                        </div>
                     : <div className="relative flex items-center justify-center">
                         <Image className="w-screen h-full max-h-screen object-cover" width={300} height={300} src="/empty-state-docgen-projects.jpg" alt="Empty State" />
                         <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20"></div>
@@ -235,76 +316,10 @@ export default function Page() {
                         </Card>
                     </div>
                 }
-                <div className="flex gap-4 flex-wrap max-w-3xl justify-center">
-                    {
-                        !currentPath ? projects?.map((project, index) =>
-                            <div key={index} className="flex flex-col gap-2">
-                                <Card onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
-                                    {project}
-                                </Card>
-                                <Button onClick={() => chooseProject(project)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
-                            </div>
-                        )
-                            :
-                            <div className="flex justify-between gap-10">
-                                {files.length > 0 && (
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex gap-2">
-                                            <Image width={24} height={24} src="/files.svg" alt="Files svg" />
-                                            <h3>Arquivos</h3>
-                                        </div>
-
-                                        <div className="flex flex-wrap gap-4">
-                                            {files.map(([key, value]: any[], index: number) => (
-                                                <Card
-                                                    key={index}
-                                                    onClick={() => setDoc(value.content)}
-                                                    className="h-40 w-80 flex flex-col justify-center items-center cursor-pointer transition-all hover:scale-105 relative p-2 group"
-                                                >
-                                                    <div>
-                                                        <h3 className="font-semibold absolute top-0 start-2">{key + '.' + value.extension}</h3>
-                                                        <p>{value.content.slice(0, 100)}</p>
-                                                    </div>
-                                                    <div className="absolute top-0 start-0 w-full h-full backdrop-blur-sm flex justify-center items-center opacity-0 group-hover:opacity-100">
-                                                        <p className="uppercase font-semibold text-xl">Ver documentação</p>
-                                                    </div>
-                                                </Card>
-                                            ))}
-                                        </div>
-                                    </div>)}
-                                {folders.length > 0 && (
-                                    <div className="flex flex-col gap-2 mb-6">
-                                        <div className="flex gap-2">
-                                            <Image width={24} height={24} src="/folders.svg" alt="Folders svg" />
-                                            <h3>Pastas</h3>
-                                        </div>
-
-                                        <div className="flex flex-wrap gap-4">
-                                            {folders.map(([key]: any[], index: number) => (
-                                                <Card
-                                                    key={index}
-                                                    onClick={() => setCurrentPath(currentPath + "/" + key)}
-                                                    className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105"
-                                                >
-                                                    {key}
-                                                </Card>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>}
-                    {
-                        currentPath &&
-                        <Button disabled={readmeIsLoading} onClick={generateReadme} variant="outline" className="fixed bottom-10 right-10">
-                            Gerar README.md
-                            {readmeIsLoading && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
-                        </Button>
-                    }
-                </div>
             </main>
-            <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length && `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4`}`}>
-                <p className={`text-center text-sm ${!projects.length ? `text-white` : `text-muted-foreground`}`}>© 2025 DocGen. Todos os direitos reservados.
-                    <a className={`underline ${!projects.length ? `text-white` : `text-black`}`} href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
+            <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length ? `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4` : `bg-black`}`}>
+                <p className={`text-center text-sm text-white`}>© 2025 DocumentAI. Todos os direitos reservados.
+                    <a className={`underline text-white`} href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
                 </p>
             </footer>
         </div>
