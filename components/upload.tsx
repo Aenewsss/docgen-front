@@ -249,7 +249,7 @@ export function Upload() {
                       <p className="text-muted-foreground">Estamos buscando seus códigos...</p>
                     </div>
                   </div>
-                ) : repos.length ? (
+                ) : repos?.length ? (
                   <div className="flex flex-wrap gap-4 justify-center">
                     <div className="bg-gray-100 rounded-xl p-6 w-full">
                       <h2 className="text-xl font-semibold mb-4 text-start">Buscar Documento</h2>
@@ -313,10 +313,10 @@ export function Upload() {
                       <button
                         onClick={() =>
                           setCurrentPage((prev) =>
-                            indexOfLastRepo < filteredRepos.length ? prev + 1 : prev
+                            indexOfLastRepo < filteredRepos?.length ? prev + 1 : prev
                           )
                         }
-                        disabled={indexOfLastRepo >= filteredRepos.length}
+                        disabled={indexOfLastRepo >= filteredRepos?.length}
                         className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                       >
                         Próxima
