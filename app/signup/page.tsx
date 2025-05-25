@@ -7,6 +7,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth"
 import { auth, db } from "@/firebase/config";
 import { Button } from "@/components/ui/button";
 import { ref, set } from "firebase/database";
+import { callCheckoutPage } from "@/utils/call-checkout-page";
 
 function SignupForm() {
 
@@ -46,7 +47,11 @@ function SignupForm() {
                     creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
                 })
 
-                loginData.plan == 'free' ? router.push("/") : router.push("/pricing")
+                loginData.plan == 'free'
+                    ? router.push("/")
+                    : !loginData.plan
+                        ? router.push("/pricing")
+                        : callCheckoutPage(result.user.email!, result.user.uid, loginData.plan, loginData.billingCycle)
             })
             .catch(e => alert(`Erro ao tentar criar conta: ${e.message}`))
     }
@@ -68,7 +73,7 @@ function SignupForm() {
 
     const handleChangePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
         const formatted = formatPhone(e.target.value)
-        setLoginData({...loginData, phone: formatted})
+        setLoginData({ ...loginData, phone: formatted })
     }
 
     return (

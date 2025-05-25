@@ -5,10 +5,24 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { CheckCircle } from "lucide-react"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { useAuth } from "@/hooks/use-auth"
+import { useRouter } from "next/navigation"
+import { callCheckoutPage } from "@/utils/call-checkout-page"
 
 export function PricingPlans() {
+  const { user } = useAuth()
+
+  const router = useRouter()
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
+
+  async function handleCheckout(plan: string, billingCycle: string) {
+    if (!user) return router.push(`/signup?plan=${plan.toLowerCase()}&billingCycle=${billingCycle}`)
+
+    const email = user.email
+    const userId = user.uid
+
+    callCheckoutPage(email, userId, plan, billingCycle)
+  }
 
   const plans = [
     {
@@ -158,11 +172,13 @@ export function PricingPlans() {
               </div>
             </CardContent>
             <CardFooter>
-              <Link href={`/signup?plan=${plan.name.toLowerCase()}&billingCycle=${billingCycle}`}>
-                <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
-                  {plan.cta}
-                </Button>
-              </Link>
+              <Button
+                className="w-full"
+                variant={plan.popular ? "default" : "outline"}
+                onClick={() => handleCheckout(plan.name.toLowerCase(), billingCycle)}
+              >
+                {plan.cta}
+              </Button>
             </CardFooter>
           </Card>
         ))}

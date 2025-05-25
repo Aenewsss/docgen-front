@@ -9,6 +9,14 @@ import { usePathname, useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import CongratsModal from "@/components/congrats-modal"
 import Loading from "@/components/loading"
+import { callCheckoutPage } from "@/utils/call-checkout-page"
+
+function checkTrialExpired(trialDateEnd: string): boolean {
+  if (!trialDateEnd) return false;
+  const now = new Date();
+  const end = new Date(trialDateEnd);
+  return now > end;
+}
 
 export default function Home() {
   const { loading, user, logout } = useAuth()
@@ -16,7 +24,10 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading && user && !user?.plan) router.push('/pricing')
+    if (!loading && user) {
+      if (!user?.plan || (checkTrialExpired(user?.trialDateEnd) && user?.plan == "free")) router.push('/pricing')
+      else if (checkTrialExpired(user?.trialDateEnd)) callCheckoutPage(user.email, user.uid, user.plan, user.billingCycle)
+    }
   }, [user, pathname, loading]);
 
   if (loading) return <Loading />
