@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, onValue, push, ref } from "firebase/database";
-import { Loader2 } from "lucide-react";
+import { CirclePlus, Eye, Github, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -24,8 +24,38 @@ export default function Page() {
     const [newMessage, setNewMessage] = useState('');
     const [previewMessage, setPreviewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [readmeIsLoading, setReadmeIsLoading] = useState(false);
     const [projectsLoading, setProjectsLoading] = useState(false);
+    const [readmeContent, setReadmeContent] = useState('');
+    const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
+
+    async function fetchLastReadme() {
+        if (!user || !currentPath) return;
+        setReadmeContent(currentProjectFolder?.lastReadme);
+        setIsReadmeModalOpen(true);
+    }
+
+    async function updateRepoReadme() {
+        if (!user || !currentPath || !currentProjectFolder?.lastReadme) return;
+        try {
+            toast("Atualizando README no GitHub...", { position: 'bottom-center' });
+            const response = await fetch(`${process.env.NEXT_PUBLIC_N8N_UPDATE_README}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project: currentPath.split('/')[1],
+                    user: user.uid,
+                    userEmail: user.email,
+                })
+            });
+            const data = await response.json()
+            toast(<p>README atualizado com sucesso no GitHub! Clique <a href={data?.html_url} className="underline text-blue-400">aqui</a> para visualizar</p>, { position: 'bottom-center' });
+        } catch (e: any) {
+            console.error("Erro ao atualizar README no GitHub:", e.message);
+            toast("Erro ao atualizar o README no GitHub.", { position: 'bottom-center' });
+        }
+    }
 
     const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
@@ -35,19 +65,18 @@ export default function Page() {
 
     const entries = currentProjectFolder && Object.entries(currentProjectFolder);
     const files = entries?.filter(([_, value]: any[]) => value.extension);
-    const folders = entries?.filter(([key, value]: any[]) => !value.extension && key != 'summary');
+    const folders = entries?.filter(([key, value]: any[]) => !value.extension && key != 'summary' && key != 'lastReadme');
 
     async function getData() {
         setProjectsLoading(true)
         const dbRef = ref(db, `documentations/${user.uid}`)
 
-        const result = await get(dbRef)
-
-        if (result.exists()) {
-            const data = result.val()
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val()
 
             setProjects(Object.keys(data))
-        }
+        });
+
         setProjectsLoading(false)
     }
 
@@ -64,17 +93,18 @@ export default function Page() {
         const path = 'documentations/' + (currentPath || `${user.uid}/${project}`)
         const dbRef = ref(db, path)
 
-        const result = await get(dbRef)
-        if (result.exists()) {
-            const data = result.val()
-            setCurrentProjectFolder(data)
-            !currentPath && setCurrentPath(path.includes('documentations') ? path.split('/').slice(1).join('/') : path)
-        }
+        onValue(dbRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val()
+                setCurrentProjectFolder(data)
+                !currentPath && setCurrentPath(path.includes('documentations') ? path.split('/').slice(1).join('/') : path)
+            }
+        })
     }
 
     async function generateReadme() {
         try {
-            toast("O README será enviado por email!", {position: 'bottom-center'});
+            toast("O README será enviado por email!", { position: 'bottom-center' });
             fetch(`${process.env.NEXT_PUBLIC_N8N_README}`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -144,6 +174,23 @@ export default function Page() {
 
     return (
         <div className="min-h-screen flex flex-col">
+            {/* Modal de visualização do README */}
+            {isReadmeModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[70]">
+                    <div className="bg-white max-w-3xl w-full p-6 rounded-md relative">
+                        <button
+                            className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
+                            onClick={() => setIsReadmeModalOpen(false)}
+                        >
+                            ×
+                        </button>
+                        <h2 className="text-2xl font-bold mb-4">Último README.md</h2>
+                        <div className="prose max-h-[70vh] overflow-y-auto">
+                            <ReactMarkdown>{readmeContent}</ReactMarkdown>
+                        </div>
+                    </div>
+                </div>
+            )}
             <Header />
             <main className={`flex-1 flex flex-col ${projects.length ? `` : `-mt-20`}`}>
                 {projects.length ?
@@ -219,20 +266,41 @@ export default function Page() {
                             </div>
                             <div className="flex flex-col gap-4 w-1/2 mt-10">
                                 {/* Mapa e projeto */}
-                                <Button disabled={readmeIsLoading} onClick={generateReadme} variant="outline" className="self-start">
-                                    Gerar README.md
-                                    {readmeIsLoading && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
-                                </Button>
-                                <div className="text-start flex gap-2">
-                                    <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>
-                                    {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
-                                        <span key={index} onClick={() => {
-                                            if (index < arr.length - 1) {
-                                                console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
-                                                setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
-                                            }
-                                        }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
-                                    )}
+                                <div className="flex flex-col gap-2 mt-4">
+                                    <h2 className="text-2xl font-medium">README</h2>
+                                    <div className="flex gap-4 mb-4">
+                                        <Button onClick={generateReadme} variant="outline">
+                                            <CirclePlus />
+                                            Gerar novo .md
+                                        </Button>
+                                        {currentProjectFolder?.lastReadme &&
+                                            <>
+                                                <Button variant="outline" onClick={fetchLastReadme}>
+                                                    <Eye />
+                                                    Visualizar último .md
+                                                </Button>
+                                                <Button variant="outline" onClick={updateRepoReadme}>
+                                                    <Github />
+                                                    Atualizar .md no GitHub
+                                                </Button>
+                                            </>
+                                        }
+                                    </div>
+                                </div>
+                                <hr />
+                                <div className="flex flex-col gap-2">
+                                    {/* <h2 className="text-2xl font-medium">Projeto {currentPath.split('/')[1]}</h2> */}
+                                    <div className="text-start flex gap-2">
+                                        <span onClick={() => setCurrentPath('')} className="text-muted-foreground cursor-pointer hover:underline">Projetos /</span>
+                                        {currentPath.split("/").filter((_, i) => i > 0).map((el, index, arr) =>
+                                            <span key={index} onClick={() => {
+                                                if (index < arr.length - 1) {
+                                                    console.log(currentPath, currentPath.split('/').slice(0, index + 2).join('/'), index)
+                                                    setCurrentPath(currentPath.split('/').slice(0, index + 2).join('/'))
+                                                }
+                                            }} className={`${index < arr.length - 1 && 'text-muted-foreground cursor-pointer group'}`}><span className="transition-all group-hover:underline">{el}</span>{index < arr.length - 1 && <>&nbsp;/&nbsp;</>}</span>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="flex justify-between gap-10">
@@ -301,13 +369,13 @@ export default function Page() {
                         </Card>
                     </div>
                 }
-            </main>
+            </main >
             <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length ? `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4` : `bg-black`}`}>
                 <p className={`text-center text-sm text-white`}>© 2025 DocumentAI. Todos os direitos reservados.
                     <a className={`underline text-white`} href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
                 </p>
             </footer>
             <ToastContainer />
-        </div>
+        </div >
     )
 }

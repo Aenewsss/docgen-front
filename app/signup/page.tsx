@@ -8,12 +8,14 @@ import { auth, db } from "@/firebase/config";
 import { Button } from "@/components/ui/button";
 import { ref, set } from "firebase/database";
 import { callCheckoutPage } from "@/utils/call-checkout-page";
+import { Loader2 } from "lucide-react";
 
 function SignupForm() {
 
     const router = useRouter()
     const searchParams = useSearchParams()
 
+    const [isLoading, setIsLoading] = useState(false);
     const [loginData, setLoginData] = useState({
         email: '', password: '', repeatPassword: '',
         name: '', company: '', phone: '', country: '',
@@ -25,7 +27,7 @@ function SignupForm() {
     }, [searchParams]);
 
     function handleSignup() {
-
+        setIsLoading(true)
         if (loginData.password != loginData.repeatPassword) return alert("As senhas não são iguais")
 
         if (Object.values(loginData).filter(Boolean).some(el => !el)) {
@@ -54,6 +56,7 @@ function SignupForm() {
                         : callCheckoutPage(result.user.email!, result.user.uid, loginData.plan, loginData.billingCycle)
             })
             .catch(e => alert(`Erro ao tentar criar conta: ${e.message}`))
+            .finally(() => setIsLoading(false))
     }
 
     function formatPhone(value: string): string {
@@ -110,7 +113,10 @@ function SignupForm() {
                 <label htmlFor="">Telefone*</label>
                 <input value={loginData.phone} onChange={handleChangePhone} className="border rounded-md p-2" type="tel" />
             </div>
-            <Button type="button" onClick={handleSignup} className="w-full" variant="default">Cadastrar</Button>
+            <Button disabled={isLoading} type="button" onClick={handleSignup} className="w-full" variant="default">
+                {isLoading && <Loader2 className="w-12 h-12 animate-spin" />}
+                Cadastrar
+            </Button>
         </form>
     )
 }

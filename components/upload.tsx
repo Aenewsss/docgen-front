@@ -108,15 +108,28 @@ export function Upload() {
     }
   }
 
-  useEffect(() => {
-    if (searchParams.get('token')) {
-      localStorage.setItem('github_token', searchParams.get('token')!)
+  // Atualiza o github_token do usuário no Firebase
+  async function updateUserGithubToken(token: string) {
+    if (!user?.uid) return;
+    const userRef = ref(db, `users/${user.uid}`);
+    await update(userRef, {
+      github_token: token,
+    });
+  }
 
-      getReposData(searchParams.get('token')!)
+  useEffect(() => {
+    if (!user) return
+  
+    if (searchParams.get('token')) {
+      const token = searchParams.get('token')!;
+      localStorage.setItem('github_token', token);
+      updateUserGithubToken(token);
+      getReposData(token);
     } else {
-      getReposData()
+      getReposData(user?.github_token);
     }
-  }, [router])
+
+  }, [router, user]);
 
   async function handleRepoSelect(data: any) {
     setIsCheckingCharacters(true);
