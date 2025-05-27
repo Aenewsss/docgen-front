@@ -11,6 +11,7 @@ import Link from "next/link"
 import RepoMessageModal from "./repo-message-modal"
 import { ref, update } from "firebase/database"
 import { db } from "@/firebase/config"
+import { Switch } from "./ui/switch"
 
 export function Upload() {
 
@@ -31,6 +32,7 @@ export function Upload() {
   const [currentPage, setCurrentPage] = useState(1);
   const [tokenEstimation, setTokenEstimation] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [autoUpdate, setAutoUpdate] = useState(true);
   const reposPerPage = 9;
 
   // Cálculo de índices para a página atual
@@ -119,7 +121,7 @@ export function Upload() {
 
   useEffect(() => {
     if (!user) return
-  
+
     if (searchParams.get('token')) {
       const token = searchParams.get('token')!;
       localStorage.setItem('github_token', token);
@@ -135,7 +137,7 @@ export function Upload() {
     setIsCheckingCharacters(true);
     const [repo_owner, repo_name] = data.full_name.split("/");
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/estimate-tokens?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/estimate-tokens?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${user.github_token}`, {
       method: "POST",
     });
 
@@ -151,7 +153,23 @@ export function Upload() {
     setIsLoading(true)
     const [repo_owner, repo_name] = data.split("/")
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${localStorage.getItem('github_token')}&user=${user.uid}&email=${user.email}`,
+    if (autoUpdate) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/create-webhook`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.github_token}`,
+        },
+        body: JSON.stringify({
+          repo_owner,
+          repo_name,
+          user_id: user.uid,
+          email: user.email,
+        }),
+      });
+    }
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/download-repo?repo_owner=${repo_owner}&repo_name=${repo_name}&token=${user.github_token}&user=${user.uid}&email=${user.email}`,
       {
         method: 'POST',
       }
@@ -184,6 +202,11 @@ export function Upload() {
             <p className="mb-2">Arquivos considerados: <strong>{tokenEstimation.files_counted}</strong></p>
             <p className="mb-2">Caracteres totais: <strong>{tokenEstimation.total_characters?.toLocaleString('pt-BR')}</strong></p>
             <p className="mb-2">Créditos estimados: <strong>{tokenEstimation.estimated_tokens?.toLocaleString('pt-BR')}</strong></p>
+
+            <label htmlFor="autoUpdate" className="text-sm font-medium text-gray-700">
+              Atualizar automaticamente quando houver mudanças na branch principal
+              <Switch checked={autoUpdate} onCheckedChange={(checked) => setAutoUpdate(checked)} />
+            </label>
 
             {
               tokenEstimation.estimated_tokens.toLocaleString('pt-BR') > user.credits

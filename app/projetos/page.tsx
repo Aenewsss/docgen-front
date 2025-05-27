@@ -1,12 +1,13 @@
 'use client'
 import { Header } from "@/components/header";
 import Loading from "@/components/loading";
+import Tooltip from "@/components/tooltip";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
-import { get, onValue, push, ref } from "firebase/database";
-import { CirclePlus, Eye, Github, Loader2 } from "lucide-react";
+import { get, onValue, push, ref, update } from "firebase/database";
+import { CirclePlus, Dot, Eye, Github, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -14,11 +15,14 @@ import ReactMarkdown from "react-markdown"
 import { ToastContainer, toast } from 'react-toastify';
 
 export default function Page() {
+    const toastShownRef = useRef(false);
 
     const { loading, user } = useAuth()
+
     const [projects, setProjects] = useState<string[]>([]);
     const [currentProjectFolder, setCurrentProjectFolder] = useState<any>();
     const [currentPath, setCurrentPath] = useState('');
+    const [oldProjectName, setOldProjectName] = useState('');
     const [doc, setDoc] = useState('');
     const [messages, setMessages] = useState<{ text: string, fromAI: boolean }[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -38,7 +42,7 @@ export default function Page() {
         if (!user || !currentPath || !currentProjectFolder?.lastReadme) return;
         try {
             toast("Atualizando README no GitHub...", { position: 'bottom-center' });
-            const response = await fetch(`${process.env.NEXT_PUBLIC_N8N_UPDATE_README}`, {
+            fetch(`${process.env.NEXT_PUBLIC_N8N_UPDATE_README}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -49,8 +53,6 @@ export default function Page() {
                     userEmail: user.email,
                 })
             });
-            const data = await response.json()
-            toast(<p>README atualizado com sucesso no GitHub! Clique <a href={data?.html_url} className="underline text-blue-400">aqui</a> para visualizar</p>, { position: 'bottom-center' });
         } catch (e: any) {
             console.error("Erro ao atualizar README no GitHub:", e.message);
             toast("Erro ao atualizar o README no GitHub.", { position: 'bottom-center' });
@@ -60,7 +62,9 @@ export default function Page() {
     const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }, 100);
     }
 
     const entries = currentProjectFolder && Object.entries(currentProjectFolder);
@@ -137,6 +141,7 @@ export default function Page() {
         setPreviewMessage('')
         setMessages(prev => [...prev, userMessage, aiMessage])
         setIsLoading(false)
+        scrollToBottom()
 
         // 🔥 Salvar no Firebase
         const chatRef = ref(db, `chats/${user.uid}/${currentPath.split('/')[1]}`)
@@ -149,9 +154,44 @@ export default function Page() {
     }
 
     useEffect(() => {
+        if(!user) return
+        
+        const statusRef = ref(db, `users/${user.uid}/status`);
+        const unsubscribeStatus = onValue(statusRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data.updateReadmeGithub && !toastShownRef.current) {
+                toastShownRef.current = true;
+
+                toast(
+                    <p>
+                        README atualizado com sucesso no GitHub! Clique&nbsp;
+                        <a href={data.updateReadmeGithub} className="underline text-blue-400" target="_blank">
+                            aqui
+                        </a>
+                        &nbsp;para visualizar.
+                    </p>,
+                    {
+                        position: 'bottom-center',
+                        onClose: async () => {
+                            await update(statusRef, { updateReadmeGithub: '' })
+                            toastShownRef.current = false;
+                        }
+                    }
+                );
+            }
+        });
+        return () => {
+            unsubscribeStatus();
+        }
+
+    }, [user?.status]);
+
+    useEffect(() => {
         if (!user || !currentPath) return;
 
+        if (oldProjectName == currentPath.split('/')[1]) return
         const projectName = currentPath.split("/")[1];
+        setOldProjectName(projectName)
         const chatRef = ref(db, `chats/${user.uid}/${projectName}`);
 
         const unsubscribe = onValue(chatRef, (snapshot) => {
@@ -167,7 +207,9 @@ export default function Page() {
             }
         });
 
-        return () => unsubscribe();
+        return () => {
+            unsubscribe();
+        }
     }, [user, currentPath]);
 
     if (loading || projectsLoading) return <Loading />
@@ -241,13 +283,26 @@ export default function Page() {
                                             )
                                         }
                                         {
-                                            previewMessage && <div className="flex gap-2 items-start justify-end">
-                                                <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                                                    {previewMessage}
-                                                </p>
-                                            </div>
+                                            previewMessage &&
+                                            <>
+                                                <div className="flex gap-2 items-start justify-end">
+                                                    <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                                        {previewMessage}
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-2 items-start">
+                                                    <div className="w-10 h-10 bg-[rgb(30,30,30)] rounded-full flex justify-center items-center">
+                                                        <Image className="w-[60%] h-[60%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocumentAI Icon" />
+                                                    </div>
+                                                    <div className="flex text-white -space-x-4 items-center -ms-2">
+                                                        <Dot className="w-10 h-10 animate-ping" />
+                                                        <Dot className="w-10 h-10 animate-ping delay-150" />
+                                                        <Dot className="w-10 h-10 animate-ping delay-300" />
+                                                    </div>
+                                                </div>
+                                            </>
                                         }
-                                        <div ref={messagesEndRef} />
+                                        <div ref={messagesEndRef} className="min-h-[1px]" />
                                     </div>
                                 </div>
                                 <div className="mt-4 flex gap-2 ">
@@ -269,19 +324,21 @@ export default function Page() {
                                 <div className="flex flex-col gap-2 mt-4">
                                     <h2 className="text-2xl font-medium">README</h2>
                                     <div className="flex gap-4 mb-4">
-                                        <Button onClick={generateReadme} variant="outline">
-                                            <CirclePlus />
-                                            Gerar novo .md
-                                        </Button>
+                                        <Tooltip message={currentProjectFolder?.lastReadme && "Só sera possível gerar outro readme se o código for alterado."}>
+                                            <Button disabled={currentProjectFolder?.lastReadme} onClick={generateReadme} variant="outline">
+                                                <CirclePlus />
+                                                Gerar novo
+                                            </Button>
+                                        </Tooltip>
                                         {currentProjectFolder?.lastReadme &&
                                             <>
                                                 <Button variant="outline" onClick={fetchLastReadme}>
                                                     <Eye />
-                                                    Visualizar último .md
+                                                    Visualizar último
                                                 </Button>
                                                 <Button variant="outline" onClick={updateRepoReadme}>
                                                     <Github />
-                                                    Atualizar .md no GitHub
+                                                    Atualizar no GitHub
                                                 </Button>
                                             </>
                                         }
