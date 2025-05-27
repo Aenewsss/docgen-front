@@ -4,10 +4,11 @@ import Loading from "@/components/loading";
 import Tooltip from "@/components/tooltip";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, onValue, push, ref, update } from "firebase/database";
-import { CirclePlus, Dot, Eye, Github, Loader2 } from "lucide-react";
+import { CirclePlus, Dot, Eye, Github, Loader2, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -19,7 +20,8 @@ export default function Page() {
 
     const { loading, user } = useAuth()
 
-    const [projects, setProjects] = useState<string[]>([]);
+    const [projects, setProjects] = useState<any[]>([]);
+    const [showSettingsModal, setShowSettingsModal] = useState<number | null>(null);
     const [currentProjectFolder, setCurrentProjectFolder] = useState<any>();
     const [currentPath, setCurrentPath] = useState('');
     const [oldProjectName, setOldProjectName] = useState('');
@@ -69,7 +71,7 @@ export default function Page() {
 
     const entries = currentProjectFolder && Object.entries(currentProjectFolder);
     const files = entries?.filter(([_, value]: any[]) => value.extension);
-    const folders = entries?.filter(([key, value]: any[]) => !value.extension && key != 'summary' && key != 'lastReadme');
+    const folders = entries?.filter(([key, value]: any[]) => !value.extension && key != 'summary' && key != 'lastReadme' && key != 'autoUpdate');
 
     async function getData() {
         setProjectsLoading(true)
@@ -77,13 +79,11 @@ export default function Page() {
 
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val()
-
-            setProjects(Object.keys(data))
+            setProjects(Object.entries(data).map(([key, value]: any) => ({ name: key, autoUpdate: value?.autoUpdate || false })))
         });
 
         setProjectsLoading(false)
     }
-
     useEffect(() => {
         user?.uid && getData()
     }, [user]);
@@ -93,7 +93,6 @@ export default function Page() {
     }, [currentPath]);
 
     async function chooseProject(project?: string) {
-        console.log(project)
         const path = 'documentations/' + (currentPath || `${user.uid}/${project}`)
         const dbRef = ref(db, path)
 
@@ -154,8 +153,8 @@ export default function Page() {
     }
 
     useEffect(() => {
-        if(!user) return
-        
+        if (!user) return
+
         const statusRef = ref(db, `users/${user.uid}/status`);
         const unsubscribeStatus = onValue(statusRef, (snapshot) => {
             const data = snapshot.val();
@@ -240,14 +239,83 @@ export default function Page() {
                         ? <section className="mt-20 w-full flex flex-col items-center">
                             <h1 className="text-5xl font-semibold">Meus Projetos</h1>
                             <p className="text-xl text-muted-foreground mb-6">Aqui estão listados todos seus projetos documentados.</p>
-                            {projects?.map((project, index) =>
-                                <div key={index} className="flex flex-col gap-2">
-                                    <Card onClick={() => chooseProject(project)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105">
-                                        {project}
-                                    </Card>
-                                    <Button onClick={() => chooseProject(project)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
-                                </div>
-                            )}
+                            <div className="flex gap-5 flex-wrap">
+                                {projects?.map((project, index) =>
+                                    <div key={index} className="flex flex-col gap-2">
+                                        {showSettingsModal == index &&
+                                            <div className="fixed inset-0 bg-black bg-opacity-30 z-[80] flex items-center justify-center">
+                                                <div className="bg-white p-6 rounded-lg w-[400px] relative">
+                                                    <button
+                                                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
+                                                        onClick={() => {
+                                                            setShowSettingsModal(null)
+                                                        }}
+                                                    >
+                                                        ×
+                                                    </button>
+                                                    <h2 className="text-xl font-bold">Configurações do Projeto</h2>
+                                                    <h3 className="mb-4 font-semibold mt-2">{project.name}</h3>
+                                                    <div className="flex justify-between items-center">
+                                                        <span>Atualização automática</span>
+                                                        <Switch
+                                                            checked={project.autoUpdate}
+                                                            onCheckedChange={async (checked) => {
+                                                                const [repo_owner, repo_name] = project.name.split("_");
+                                                                if (checked) {
+                                                                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/create-webhook`, {
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            'Content-Type': 'application/json',
+                                                                            Authorization: `Bearer ${user.github_token}`,
+                                                                        },
+                                                                        body: JSON.stringify({
+                                                                            repo_owner,
+                                                                            repo_name,
+                                                                            user_id: user.uid,
+                                                                            email: user.email,
+                                                                        }),
+                                                                    })
+                                                                        .then(_ => toast("Webhook criado com sucesso para atualização automática!", { position: 'bottom-center' }))
+                                                                        .catch(_ => toast.error("Falha ao criar Webhook para atualização automática!", { position: 'bottom-center' }));
+                                                                } else {
+                                                                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/delete-webhook`, {
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            'Content-Type': 'application/json',
+                                                                            Authorization: `Bearer ${user.github_token}`,
+                                                                        },
+                                                                        body: JSON.stringify({
+                                                                            repo_owner,
+                                                                            repo_name,
+                                                                            user_id: user.uid,
+                                                                            email: user.email,
+                                                                        }),
+                                                                    })
+                                                                        .then(_ => toast("Webhook removido com sucesso. A atualização automática foi desativada.", { position: 'bottom-center' }))
+                                                                        .catch(_ => toast.error("Falha ao remover Webhook de atualização automática!", { position: 'bottom-center' }));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        <Card onClick={() => chooseProject(project.name)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105 relative">
+                                            {project.name}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowSettingsModal(index);
+                                                }}
+                                                className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100 z-20"
+                                            >
+                                                <Settings className="w-4 h-4 text-gray-600" />
+                                            </button>
+                                        </Card>
+                                        <Button onClick={() => chooseProject(project.name)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
+                                    </div>
+                                )}
+                            </div>
                         </section>
                         : <div className="w-full flex gap-10 flex-1">
                             {/* DocumentAI Chat */}
@@ -361,7 +429,7 @@ export default function Page() {
                                 </div>
 
                                 <div className="flex justify-between gap-10">
-                                    {files.length > 0 && (
+                                    {files?.length > 0 && (
                                         <div className="flex flex-col gap-2">
                                             <div className="flex gap-2">
                                                 <Image width={24} height={24} src="/files.svg" alt="Files svg" />
@@ -386,7 +454,7 @@ export default function Page() {
                                                 ))}
                                             </div>
                                         </div>)}
-                                    {folders.length > 0 && (
+                                    {folders?.length > 0 && (
                                         <div className="flex flex-col gap-2 mb-6">
                                             <div className="flex gap-2">
                                                 <Image width={24} height={24} src="/folders.svg" alt="Folders svg" />
@@ -433,6 +501,7 @@ export default function Page() {
                 </p>
             </footer>
             <ToastContainer />
+
         </div >
     )
 }
