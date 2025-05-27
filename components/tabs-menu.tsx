@@ -7,7 +7,7 @@ import clsx from 'clsx'
 const tabs = [
     { label: 'MEUS PROJETOS', path: '/projetos' },
     { label: 'MEU PLANO', path: '/meu-plano' },
-    // { label: 'HISTÓRICO DE USO', path: '/historico-de-uso' }
+    { label: 'HISTÓRICO DE USO', path: '/historico-de-uso' }
 ]
 
 export default function TabsMenu() {

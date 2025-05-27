@@ -236,10 +236,10 @@ export default function Page() {
             <main className={`flex-1 flex flex-col ${projects.length ? `` : `-mt-20`}`}>
                 {projects.length ?
                     !currentPath
-                        ? <section className="mt-20 w-full flex flex-col items-center">
+                        ? <section className="mt-20 w-full flex flex-col items-center justify-center mx-auto max-w-6xl ">
                             <h1 className="text-5xl font-semibold">Meus Projetos</h1>
                             <p className="text-xl text-muted-foreground mb-6">Aqui estão listados todos seus projetos documentados.</p>
-                            <div className="flex gap-5 flex-wrap">
+                            <div className="flex gap-5 flex-wrap justify-center">
                                 {projects?.map((project, index) =>
                                     <div key={index} className="flex flex-col gap-2">
                                         {showSettingsModal == index &&
