@@ -233,7 +233,7 @@ export default function Page() {
                 </div>
             )}
             <Header />
-            <main className={`flex-1 flex flex-col ${projects.length ? `` : `-mt-20`}`}>
+            <main className={`flex-1 flex flex-col mb-10 ${projects.length ? `` : `-mt-20`}`}>
                 {projects.length ?
                     !currentPath
                         ? <section className="mt-20 w-full flex flex-col items-center justify-center mx-auto max-w-6xl ">
@@ -301,7 +301,10 @@ export default function Page() {
                                             </div>
                                         }
                                         <Card onClick={() => chooseProject(project.name)} className="h-40 w-80 flex justify-center items-center cursor-pointer transition-all hover:scale-105 relative">
-                                            {project.name}
+                                            <div className="flex flex-col justify-center h-full gap-8">
+                                                {project.name}
+                                                <Button onClick={() => chooseProject(project.name)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
+                                            </div>
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -311,8 +314,8 @@ export default function Page() {
                                             >
                                                 <Settings className="w-4 h-4 text-gray-600" />
                                             </button>
+
                                         </Card>
-                                        <Button onClick={() => chooseProject(project.name)} className="transition-all hover:scale-105 flex self-center">Acessar o projeto</Button>
                                     </div>
                                 )}
                             </div>
