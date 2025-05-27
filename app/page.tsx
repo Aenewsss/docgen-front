@@ -12,6 +12,7 @@ import { Loader2, Settings } from "lucide-react"
 import CongratsModal from "@/components/congrats-modal"
 import Loading from "@/components/loading"
 import { callCheckoutPage } from "@/utils/call-checkout-page"
+import CongratsCreditsModal from "@/components/congrats-credits-modal"
 
 function checkTrialExpired(trialDateEnd: string): boolean {
   if (!trialDateEnd) return false;
@@ -79,6 +80,7 @@ export default function Home() {
         </Suspense>
 
         <CongratsModal loading={loading} user={user} />
+        <CongratsCreditsModal loading={loading} user={user} />
 
         <Features />
         <Examples />
