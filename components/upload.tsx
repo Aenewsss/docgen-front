@@ -23,12 +23,12 @@ export function Upload() {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [repos, setRepos] = useState([]);
+  const [repos, setRepos] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingCharacters, setIsCheckingCharacters] = useState(false);
   const [documentName, setDocumentName] = useState("");
   const [visibility, setVisibility] = useState("");
-  const [filteredRepos, setFilteredRepos] = useState([]);
+  const [filteredRepos, setFilteredRepos] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [tokenEstimation, setTokenEstimation] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -46,7 +46,7 @@ export function Upload() {
 
     const result = repos.filter((el: any) => {
       const matchesName = documentName === "" || lower(el.name).includes(lower(documentName));
-      const matchesVisibility = visibility === "Privado" ? el.private === true : el.private === false;
+      const matchesVisibility = visibility ? visibility === "Privado" ? el.private === true : el.private === false : true
 
       return matchesName && matchesVisibility;
     });
