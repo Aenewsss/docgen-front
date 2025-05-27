@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, onValue, push, ref, update } from "firebase/database";
-import { CirclePlus, Dot, Eye, Github, Loader2, Settings } from "lucide-react";
+import { CirclePlus, CodeXml, Dot, Eye, Folder, Github, Loader2, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -217,7 +217,7 @@ export default function Page() {
         <div className="min-h-screen flex flex-col">
             {/* Modal de visualização do README */}
             {isReadmeModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[70]">
+                <div className="fixed inset-0 bg-zinc-900 bg-opacity-50 flex justify-center items-center z-[70]">
                     <div className="bg-white max-w-3xl w-full p-6 rounded-md relative">
                         <button
                             className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
@@ -243,7 +243,7 @@ export default function Page() {
                                 {projects?.map((project, index) =>
                                     <div key={index} className="flex flex-col gap-2">
                                         {showSettingsModal == index &&
-                                            <div className="fixed inset-0 bg-black bg-opacity-30 z-[80] flex items-center justify-center">
+                                            <div className="fixed inset-0 bg-zinc-900 bg-opacity-30 z-[80] flex items-center justify-center">
                                                 <div className="bg-white p-6 rounded-lg w-[400px] relative">
                                                     <button
                                                         className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
@@ -322,7 +322,7 @@ export default function Page() {
                         </section>
                         : <div className="w-full flex gap-10 flex-1">
                             {/* DocumentAI Chat */}
-                            <div className="p-4 text-start w-1/2 shadow-md flex-1 flex flex-col justify-between bg-black">
+                            <div className="p-4 text-start w-1/2 shadow-md flex-1 flex flex-col justify-between bg-zinc-900">
                                 <div className="flex flex-col">
                                     <h2 className="text-xl font-semibold mb-0 text-white">Converse com a DocumentAI</h2>
                                     <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
@@ -347,7 +347,7 @@ export default function Page() {
                                                 </div>
                                                     :
                                                     <div key={index} className="flex gap-2 items-start justify-end">
-                                                        <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                                        <p className="bg-primary text-white dark:text-black p-3 rounded-lg shadow-sm max-w-[80%]">
                                                             {message.text}
                                                         </p>
                                                     </div>
@@ -357,7 +357,7 @@ export default function Page() {
                                             previewMessage &&
                                             <>
                                                 <div className="flex gap-2 items-start justify-end">
-                                                    <p className="bg-primary text-white p-3 rounded-lg shadow-sm max-w-[80%]">
+                                                    <p className="bg-primary text-white dark:text-black p-3 rounded-lg shadow-sm max-w-[80%]">
                                                         {previewMessage}
                                                     </p>
                                                 </div>
@@ -435,7 +435,7 @@ export default function Page() {
                                     {files?.length > 0 && (
                                         <div className="flex flex-col gap-2">
                                             <div className="flex gap-2">
-                                                <Image width={24} height={24} src="/files.svg" alt="Files svg" />
+                                                <CodeXml width={24} height={24} />
                                                 <h3>Arquivos</h3>
                                             </div>
 
@@ -460,7 +460,7 @@ export default function Page() {
                                     {folders?.length > 0 && (
                                         <div className="flex flex-col gap-2 mb-6">
                                             <div className="flex gap-2">
-                                                <Image width={24} height={24} src="/folders.svg" alt="Folders svg" />
+                                                <Folder width={24} height={24} />
                                                 <h3>Pastas</h3>
                                             </div>
 
@@ -482,7 +482,7 @@ export default function Page() {
                         </div>
                     : <div className="relative flex items-center justify-center">
                         <Image className="w-screen h-full max-h-screen object-cover" width={300} height={300} src="/empty-state-docgen-projects.jpg" alt="Empty State" />
-                        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20"></div>
+                        <div className="absolute top-0 left-0 w-full h-full bg-zinc-900 opacity-20"></div>
 
                         <h1 className="absolute text-4xl text-white p-2 z-10 shadow-black shadow-lg font-bold tracking-tight sm:text-5xl md:text-6xl">Nenhum projeto disponível</h1>
                         <Link className="absolute text-lg mt-32  transition-all hover:backdrop-blur-lg hover:scale-105 text-white p-2 z-10 shadow-black shadow-lg font-bold tracking-tight" href="/">Selecionar projeto</Link>
@@ -498,7 +498,7 @@ export default function Page() {
                     </div>
                 }
             </main >
-            <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length ? `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4` : `bg-black`}`}>
+            <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length ? `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4` : `bg-zinc-900`}`}>
                 <p className={`text-center text-sm text-white`}>© 2025 DocumentAI. Todos os direitos reservados.
                     <a className={`underline text-white`} href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
                 </p>

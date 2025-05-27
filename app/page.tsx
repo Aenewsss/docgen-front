@@ -13,6 +13,7 @@ import CongratsModal from "@/components/congrats-modal"
 import Loading from "@/components/loading"
 import { callCheckoutPage } from "@/utils/call-checkout-page"
 import CongratsCreditsModal from "@/components/congrats-credits-modal"
+import Footer from "@/components/footer"
 
 function checkTrialExpired(trialDateEnd: string): boolean {
   if (!trialDateEnd) return false;
@@ -85,8 +86,8 @@ export default function Home() {
         <Features />
         <Examples />
         {showOrganizationsModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+          <div className="fixed inset-0 bg-zinc-900 bg-opacity-80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
               <button onClick={() => setShowOrganizationsModal(false)} className="absolute top-2 right-2 text-red-500 text-xl">×</button>
               <h2 className="text-xl font-semibold mb-4">Organizações do GitHub</h2>
               <p className="mb-4 text-muted-foreground">Selecione as organizações às quais deseja autorizar ou revogar acesso para o DocumentAI.</p>
@@ -116,11 +117,7 @@ export default function Home() {
           </div>
         )}
       </main>
-      <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-        <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.
-          <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
-        </p>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ref, set } from "firebase/database";
 import { callCheckoutPage } from "@/utils/call-checkout-page";
 import { Loader2 } from "lucide-react";
+import Footer from "@/components/footer";
 
 function SignupForm() {
 
@@ -130,11 +131,7 @@ export default function Page() {
                     <SignupForm />
                 </Suspense>
             </main>
-            <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-                <p className="text-center text-sm text-muted-foreground">© 2025 DocGen. Todos os direitos reservados.
-                    <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
-                </p>
-            </footer>
+             <Footer />
         </div>
     );
 }

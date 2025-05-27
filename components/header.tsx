@@ -1,11 +1,12 @@
 "use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Code2 } from "lucide-react"
+import { Code2, Contrast } from "lucide-react"
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import TabsMenu from "./tabs-menu";
 import { usePathname, useRouter } from "next/navigation";
+import Tooltip from "./tooltip";
 
 export function Header() {
 
@@ -14,8 +15,25 @@ export function Header() {
   const router = useRouter()
 
   useEffect(() => {
-    if(!loading && user && !user?.plan) router.push('/pricing')
+    if (!loading && user && !user?.plan) router.push('/pricing')
   }, [user, pathname, loading]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.contains('dark')
+    if (isDark) localStorage.setItem('theme', 'light')
+    else localStorage.setItem('theme', 'dark')
+
+    document.documentElement.classList.toggle('dark')
+  }
 
   return (<>
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex justify-center">
@@ -26,7 +44,7 @@ export function Header() {
             <span className="text-xl font-bold">DocumentAI</span>
           </Link>
         </div>
-        {(!loading && (!user || user.plan))  && <nav className="hidden md:flex items-center gap-6">
+        {(!loading && (!user || user.plan)) && <nav className="hidden md:flex items-center gap-6">
           <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
             Recursos
           </Link>
@@ -41,8 +59,11 @@ export function Header() {
         {!loading && user
           ? <div className="flex items-center gap-2">
             {/* @ts-ignore */}
-            {user.credits && user.plan && <Button className="cursor-auto hover:bg-white" variant="ghost" >🪙 Créditos: <span className={`font-semibold ${Number(user.credits) < 0 ? 'text-red-500' : 'text-black'}`}>{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
-            <Button className="cursor-auto hover:bg-white" variant="ghost" >{user.email}</Button>
+            {user.credits && user.plan && <Button className="cursor-auto hover:bg-white " variant="ghost" >🪙 Créditos: <span className={`font-semibold ${Number(user.credits) < 0 ? 'text-red-500' : 'text-black dark:text-white'}`}>{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
+            <Button className="cursor-auto hover:bg-white px-1" variant="ghost" >{user.email}</Button>
+            <Tooltip message="Alterar tema" position="bottom">
+              <Button onClick={toggleTheme} className="p-0 me-4 hover:bg-transparent hover:scale-[1.3] transition-all" variant="ghost" ><Contrast className=" h-16 w-16 scale-125" /></Button>
+            </Tooltip>
             <Button onClick={logout} variant="destructive">Sair</Button>
           </div>
           : <div className="flex items-center gap-2">

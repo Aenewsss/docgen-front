@@ -33,7 +33,7 @@ export default function RepoMessageModal({ repoMessage, clearMessage, repoError 
     if (!isOpen || !repoMessage) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 px-4">
             <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
                 {repoError ? <CircleAlert className="mx-auto text-red-600 mb-4" size={48} /> : <CheckCircle className="mx-auto text-green-600 mb-4" size={48} />}
 
@@ -44,13 +44,13 @@ export default function RepoMessageModal({ repoMessage, clearMessage, repoError 
                 <div className="flex gap-2 justify-center">
                     <button
                         onClick={handleProject}
-                        className="bg-black text-white px-6 py-2 rounded-full hover:opacity-90 transition-all hover:bg-white hover:border hover:border-black hover:text-black"
+                        className="bg-zinc-900 text-white px-6 py-2 rounded-full hover:opacity-90 transition-all hover:bg-white hover:border hover:border-black hover:text-black"
                     >
                         Acessar projeto
                     </button>
                     <button
                         onClick={handleClose}
-                        className="border-black border text-black px-6 py-2 rounded-full hover:bg-black hover:text-white transition-all"
+                        className="border-black border text-black px-6 py-2 rounded-full hover:bg-zinc-900 hover:text-white transition-all"
                     >
                         Fechar
                     </button>

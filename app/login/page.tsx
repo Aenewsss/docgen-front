@@ -1,4 +1,5 @@
 "use client"
+import Footer from "@/components/footer";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/config";
@@ -47,11 +48,7 @@ export default function Page() {
                     <p className="underline text-sm text-center">Esqueci minha senha</p>
                 </form>
             </main>
-            <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-                <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.
-                    <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
-                </p>
-            </footer>
+           <Footer />
         </div>
     )
 }

@@ -194,7 +194,7 @@ export function Upload() {
       <RepoMessageModal repoMessage={user?.repo_message} repoError={user?.repo_error} clearMessage={clearMessage} />
 
       {showModal && tokenEstimation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
+        <div className="fixed inset-0 bg-zinc-900 bg-opacity-50 z-[60] flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 max-w-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-4">Sobre o projeto</h2>
             <p className="mb-2">Organização: <strong>{tokenEstimation.repo.split('/')[0]}</strong></p>
@@ -274,7 +274,7 @@ export function Upload() {
                   </div>
                 ) : repos?.length ? (
                   <div className="flex flex-wrap gap-4 justify-center">
-                    <div className="bg-gray-100 rounded-xl p-6 w-full">
+                    <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full">
                       <h2 className="text-xl font-semibold mb-4 text-start">Buscar Documento</h2>
                       <div className="flex gap-2 justify-between">
 
@@ -310,7 +310,7 @@ export function Upload() {
                       <option>Não</option>
                     </select> */}
                         </div>
-                        <button onClick={handleSearch} className="bg-black text-white px-6 py-2 rounded-md text-sm hover:opacity-90 transition">Buscar</button>
+                        <button onClick={handleSearch} className="bg-zinc-900 dark:bg-white dark:text-black text-white px-6 py-2 rounded-md text-sm hover:opacity-90 transition">Buscar</button>
                       </div>
                     </div>
                     {currentRepos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="cursor-pointer transition-all hover:scale-105 flex flex-col items-center text-center justify-center space-y-4 w-1/2 max-w-[300px]">
@@ -326,7 +326,7 @@ export function Upload() {
                       <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                        className="px-4 py-2 bg-gray-200 dark:bg-zinc-900 rounded disabled:opacity-50"
                       >
                         Anterior
                       </button>
@@ -340,14 +340,14 @@ export function Upload() {
                           )
                         }
                         disabled={indexOfLastRepo >= filteredRepos?.length}
-                        className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                        className="px-4 py-2 bg-gray-200 dark:bg-zinc-900 rounded disabled:opacity-50"
                       >
                         Próxima
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div onClick={connectGithub} className="border-2 rounded-lg border-dashed p-12 flex flex-col items-center justify-center space-y-4 cursor-pointer group hover:bg-black hover:text-white transition-all">
+                  <div onClick={connectGithub} className="border-2 rounded-lg border-dashed p-12 flex flex-col items-center justify-center space-y-4 cursor-pointer group hover:bg-zinc-900 hover:text-white transition-all">
                     <UploadIcon className="h-12 w-12 text-muted-foreground group-hover:text-white transition-all" />
                     <div className="space-y-2">
                       <h3 className="text-xl font-medium">Importe seu projeto github aqui</h3>

@@ -88,6 +88,14 @@ body {
   }
 }
 
+body {
+  @apply bg-white text-black;
+}
+
+.dark body {
+  @apply bg-zinc-900 text-white;
+}
+
 @layer base {
   * {
     @apply border-border;

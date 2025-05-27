@@ -125,7 +125,7 @@ export function PricingPlans() {
         {plans.map((plan) => (
           <Card
             key={plan.name}
-            className={`flex flex-col ${plan.popular ? "border-primary shadow-lg shadow-black animate-in relative md:scale-105" : ""}`}
+            className={`flex flex-col ${plan.popular ? "border-primary dark:border-zinc-900 shadow-lg shadow-black dark:shadow-white animate-in duration-1000 relative md:scale-105" : ""}`}
           >
             {plan.popular && (
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

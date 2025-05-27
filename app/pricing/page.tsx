@@ -1,5 +1,6 @@
 'use client'
 
+import Footer from "@/components/footer"
 import { Header } from "@/components/header"
 import { PricingPlans } from "@/components/pricing-plans"
 import { Button } from "@/components/ui/button"
@@ -52,11 +53,7 @@ export default function PricingPage() {
           </div>
         </div>
       </main>
-      <footer className="border-t py-6 md:py-8">
-        <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8">
-          <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.</p>
-        </div>
-      </footer>
+       <Footer />
     </div>
   )
 }

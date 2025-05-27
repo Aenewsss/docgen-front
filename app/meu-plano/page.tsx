@@ -11,6 +11,7 @@ import { callCheckoutPage } from "@/utils/call-checkout-page"
 import { Header } from "@/components/header"
 import { callCheckoutCreditsPage } from "@/utils/call-checkout-credits-page"
 import Tooltip from "@/components/tooltip"
+import Footer from "@/components/footer"
 
 export default function Page() {
     const { user } = useAuth()
@@ -124,7 +125,7 @@ export default function Page() {
                                 min={10000}
                                 step={1000}
                                 placeholder="Digite a quantidade de créditos"
-                                className="border rounded-md px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary w-full"
+                                className="border dark:text-black rounded-md px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary w-full"
                                 value={inputCredits}
                                 onChange={(e) => {
                                     const rawValue = e.target.value.replace(/\./g, "").replace(/\D/g, "");
@@ -252,11 +253,7 @@ export default function Page() {
                     </div>
                 </div>
             </main>
-            <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-                <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.
-                    <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
-                </p>
-            </footer>
+           <Footer />
         </div>
     )
 }

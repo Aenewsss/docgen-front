@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContaine
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { MultiSelect } from '@/components/multiselect'
+import Footer from '@/components/footer'
 
 export default function Page() {
     const [data, setData] = useState<any[]>([])
@@ -85,7 +86,7 @@ export default function Page() {
             : true
         const matchesDate = startDate && endDate
             ? new Date(item.date.split('/').reverse().join('-')) >= startDate &&
-              new Date(item.date.split('/').reverse().join('-')) <= endDate
+            new Date(item.date.split('/').reverse().join('-')) <= endDate
             : true
         return matchesProject && matchesDate
     })
@@ -186,11 +187,7 @@ export default function Page() {
                     </div>
                 </div>
             </main>
-            <footer className="border-t py-6 md:py-8  flex items-center justify-center gap-4 md:flex-row md:gap-8 ">
-                <p className="text-center text-sm text-muted-foreground">© 2025 DocumentAI. Todos os direitos reservados.
-                    <a className="underline text-black" href="http://qrotech.com.br" target="_blank" rel="noopener noreferrer">qrotech.com.br</a>
-                </p>
-            </footer>
+            <Footer />
         </div>
     )
 }
