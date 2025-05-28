@@ -34,7 +34,7 @@ export default function PricingPage() {
           <p className="text-xl text-muted-foreground">Escolha o plano ideal para suas necessidades de documentação</p>
           {!loading && <Link onClick={(e) => {
             if (user && !user.plan) {
-              e.stopPropagation()
+              e.preventDefault()
               activeTrial()
             }
           }} href={`/signup?plan=free`}>
