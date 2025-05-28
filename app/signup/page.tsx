@@ -44,10 +44,10 @@ function SignupForm() {
                 set(dbRef, {
                     ...loginData,
                     email: result.user.email,
-                    isTrial: true,
-                    trialDateEnd: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
-                    credits: 30000,
-                    creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
+                    isTrial: !loginData.plan ? false : true,
+                    trialDateEnd: !loginData.plan ? null : new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
+                    credits: !loginData.plan ? 0 : 30000,
+                    creditsExpiresAt: !loginData.plan ? null:new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
                 })
 
                 loginData.plan == 'free'
@@ -131,7 +131,7 @@ export default function Page() {
                     <SignupForm />
                 </Suspense>
             </main>
-             <Footer />
+            <Footer />
         </div>
     );
 }

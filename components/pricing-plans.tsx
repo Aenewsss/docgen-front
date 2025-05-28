@@ -34,6 +34,8 @@ export function PricingPlans() {
       },
       features: [
         "🪙 70.000 créditos mensais",
+        "💬 Chat com IA: até 50 mensagens/mês",
+        "📄 Geração de README: até 5 arquivos/mês",
         "🧠 Documentação Inteligente com IA",
         "🗂️ Organização automática por arquivos e funções",
         "💬 Chat com IA treinado no seu projeto",
@@ -42,6 +44,7 @@ export function PricingPlans() {
         "🔐 Privacidade garantida",
         "👥 Colaboração entre times",
         "📦 Compatível com qualquer linguagem e estrutura",
+        "🔁 Possibilidade de adicionar créditos avulsos",
       ],
       limitations: [
         "Acesso antecipado ao roadmap de features",
@@ -58,6 +61,8 @@ export function PricingPlans() {
       },
       features: [
         "🪙 350.000 créditos mensais",
+        "💬 Chat com IA: até 250 mensagens/mês",
+        "📄 Geração de README: até 20 arquivos/mês",
         "🧠 Documentação Inteligente com IA",
         "🗂️ Organização automática por arquivos e funções",
         "💬 Chat com IA treinado no seu projeto",
@@ -66,7 +71,8 @@ export function PricingPlans() {
         "🔐 Privacidade garantida",
         "👥 Colaboração entre times",
         "📦 Compatível com qualquer linguagem e estrutura",
-        "✅ Acesso antecipado ao roadmap de features",
+        "Acesso antecipado ao roadmap de features",
+        "🔁 Possibilidade de adicionar créditos avulsos",
       ],
       limitations: [
       ],
@@ -82,6 +88,8 @@ export function PricingPlans() {
       },
       features: [
         "🪙 1.050.000 créditos mensais",
+        "💬 Chat com IA: até 1.000 mensagens/mês",
+        "📄 Geração de README: até 100 arquivos/mês",
         "🧠 Documentação Inteligente com IA",
         "🗂️ Organização automática por arquivos e funções",
         "💬 Chat com IA treinado no seu projeto",
@@ -90,7 +98,9 @@ export function PricingPlans() {
         "🔐 Privacidade garantida",
         "👥 Colaboração entre times",
         "📦 Compatível com qualquer linguagem e estrutura",
+        "✉️ Suporte prioritário e limites ajustáveis via contato direto",
         "Acesso antecipado ao roadmap de features",
+        "🔁 Possibilidade de adicionar créditos avulsos",
       ],
       limitations: [],
       cta: "Assinar",

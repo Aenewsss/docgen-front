@@ -44,11 +44,11 @@ export function Header() {
             <span className="text-xl font-bold">DocumentAI</span>
           </Link>
         </div>
-        {(!loading && (!user || user.plan)) && <nav className="hidden md:flex items-center gap-6">
-          <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
+        {(!loading && (!user)) && <nav className="hidden md:flex items-center gap-6">
+          <Link href="/#features" className="text-sm font-medium hover:underline underline-offset-4">
             Recursos
           </Link>
-          <Link href="#examples" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/#examples" className="text-sm font-medium hover:underline underline-offset-4">
             Exemplos
           </Link>
           <Link href="/pricing" className="text-sm font-medium hover:underline underline-offset-4">
@@ -60,7 +60,7 @@ export function Header() {
           ? <div className="flex items-center gap-2">
             {/* @ts-ignore */}
             {user.credits && user.plan && <Button className="cursor-auto hover:bg-white " variant="ghost" >🪙 Créditos: <span className={`font-semibold ${Number(user.credits) < 0 ? 'text-red-500' : 'text-black dark:text-white'}`}>{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
-            <Button className="cursor-auto hover:bg-white px-1" variant="ghost" >{user.email}</Button>
+            <Button className="cursor-auto  px-1" variant="ghost" >{user.email}</Button>
             <Tooltip message="Alterar tema" position="bottom">
               <Button onClick={toggleTheme} className="p-0 me-4 hover:bg-transparent hover:scale-[1.3] transition-all" variant="ghost" ><Contrast className=" h-16 w-16 scale-125" /></Button>
             </Tooltip>

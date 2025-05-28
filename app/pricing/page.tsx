@@ -4,12 +4,26 @@ import Footer from "@/components/footer"
 import { Header } from "@/components/header"
 import { PricingPlans } from "@/components/pricing-plans"
 import { Button } from "@/components/ui/button"
+import { db } from "@/firebase/config"
 import { useAuth } from "@/hooks/use-auth"
+import { ref, set, update } from "firebase/database"
 import Link from "next/link"
 
 export default function PricingPage() {
 
   const { loading, user } = useAuth()
+
+  function activeTrial() {
+    if (!user) return
+    const dbRef = ref(db, `users/${user.uid}`)
+
+    update(dbRef, {
+      isTrial: true,
+      trialDateEnd: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
+      credits: 30000,
+      creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
+    })
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -18,7 +32,12 @@ export default function PricingPage() {
         <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Planos e Preços</h1>
           <p className="text-xl text-muted-foreground">Escolha o plano ideal para suas necessidades de documentação</p>
-          {!loading && !user && <Link href={`/signup?plan=free`}>
+          {!loading && <Link onClick={(e) => {
+            if (user && !user.plan) {
+              e.stopPropagation()
+              activeTrial()
+            }
+          }} href={`/signup?plan=free`}>
             <Button className="mt-4" variant={"outline"}>
               Teste nossa ferramenta com<span className="text-green-600 -ms-1 font-semibold">30.000 créditos grátis</span>
             </Button>
@@ -53,7 +72,7 @@ export default function PricingPage() {
           </div>
         </div>
       </main>
-       <Footer />
+      <Footer />
     </div>
   )
 }

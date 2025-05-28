@@ -39,6 +39,8 @@ export default function Page() {
             },
             features: [
                 "🪙 70.000 créditos mensais",
+                "💬 Chat com IA: até 50 mensagens/mês",
+                "📄 Geração de README: até 5 arquivos/mês",
                 "🧠 Documentação Inteligente com IA",
                 "🗂️ Organização automática por arquivos e funções",
                 "💬 Chat com IA treinado no seu projeto",
@@ -47,6 +49,7 @@ export default function Page() {
                 "🔐 Privacidade garantida",
                 "👥 Colaboração entre times",
                 "📦 Compatível com qualquer linguagem e estrutura",
+                "🔁 Possibilidade de adicionar créditos avulsos",
             ],
             limitations: [
                 "Acesso antecipado ao roadmap de features",
@@ -63,6 +66,8 @@ export default function Page() {
             },
             features: [
                 "🪙 350.000 créditos mensais",
+                "💬 Chat com IA: até 250 mensagens/mês",
+                "📄 Geração de README: até 20 arquivos/mês",
                 "🧠 Documentação Inteligente com IA",
                 "🗂️ Organização automática por arquivos e funções",
                 "💬 Chat com IA treinado no seu projeto",
@@ -71,7 +76,8 @@ export default function Page() {
                 "🔐 Privacidade garantida",
                 "👥 Colaboração entre times",
                 "📦 Compatível com qualquer linguagem e estrutura",
-                "✅ Acesso antecipado ao roadmap de features",
+                "Acesso antecipado ao roadmap de features",
+                "🔁 Possibilidade de adicionar créditos avulsos",
             ],
             limitations: [
             ],
@@ -87,6 +93,8 @@ export default function Page() {
             },
             features: [
                 "🪙 1.050.000 créditos mensais",
+                "💬 Chat com IA: até 1.000 mensagens/mês",
+                "📄 Geração de README: até 100 arquivos/mês",
                 "🧠 Documentação Inteligente com IA",
                 "🗂️ Organização automática por arquivos e funções",
                 "💬 Chat com IA treinado no seu projeto",
@@ -95,7 +103,9 @@ export default function Page() {
                 "🔐 Privacidade garantida",
                 "👥 Colaboração entre times",
                 "📦 Compatível com qualquer linguagem e estrutura",
+                "✉️ Suporte prioritário e limites ajustáveis via contato direto",
                 "Acesso antecipado ao roadmap de features",
+                "🔁 Possibilidade de adicionar créditos avulsos",
             ],
             limitations: [],
             cta: "Upgrade",
@@ -241,11 +251,12 @@ export default function Page() {
                                 </CardContent>
                                 <CardFooter>
                                     <Button
+                                        disabled={user?.plan.toLowerCase() == plan.name.toLocaleLowerCase()}
                                         className="w-full"
                                         variant={plan.popular ? "default" : "outline"}
                                         onClick={() => handleCheckout(plan.name.toLowerCase(), billingCycle)}
                                     >
-                                        {plan.cta}
+                                        {user?.plan.toLowerCase() == plan.name.toLowerCase() ? 'Plano atual' : plan.cta}
                                     </Button>
                                 </CardFooter>
                             </Card>
@@ -253,7 +264,7 @@ export default function Page() {
                     </div>
                 </div>
             </main>
-           <Footer />
+            <Footer />
         </div>
     )
 }

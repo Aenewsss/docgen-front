@@ -80,9 +80,9 @@ export default function Page() {
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val()
             setProjects(Object.entries(data).map(([key, value]: any) => ({ name: key, autoUpdate: value?.autoUpdate || false })))
+            setProjectsLoading(false)
         });
 
-        setProjectsLoading(false)
     }
     useEffect(() => {
         user?.uid && getData()
@@ -218,7 +218,7 @@ export default function Page() {
             {/* Modal de visualização do README */}
             {isReadmeModalOpen && (
                 <div className="fixed inset-0 bg-zinc-900 bg-opacity-50 flex justify-center items-center z-[70]">
-                    <div className="bg-white max-w-3xl w-full p-6 rounded-md relative">
+                    <div className="bg-white dark:bg-black dark:text-white max-w-3xl w-full p-6 rounded-md relative">
                         <button
                             className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
                             onClick={() => setIsReadmeModalOpen(false)}
@@ -244,7 +244,7 @@ export default function Page() {
                                     <div key={index} className="flex flex-col gap-2">
                                         {showSettingsModal == index &&
                                             <div className="fixed inset-0 bg-zinc-900 bg-opacity-30 z-[80] flex items-center justify-center">
-                                                <div className="bg-white p-6 rounded-lg w-[400px] relative">
+                                                <div className="bg-white dark:text-black p-6 rounded-lg w-[400px] relative">
                                                     <button
                                                         className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
                                                         onClick={() => {
@@ -255,8 +255,8 @@ export default function Page() {
                                                     </button>
                                                     <h2 className="text-xl font-bold">Configurações do Projeto</h2>
                                                     <h3 className="mb-4 font-semibold mt-2">{project.name}</h3>
-                                                    <div className="flex justify-between items-center">
-                                                        <span>Atualização automática</span>
+                                                    <div className="flex justify-between items-center gap-4">
+                                                        <span>Atualizar automaticamente quando houver mudanças na branch principal</span>
                                                         <Switch
                                                             checked={project.autoUpdate}
                                                             onCheckedChange={async (checked) => {
