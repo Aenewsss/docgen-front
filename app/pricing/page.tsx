@@ -8,10 +8,12 @@ import { db } from "@/firebase/config"
 import { useAuth } from "@/hooks/use-auth"
 import { ref, set, update } from "firebase/database"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function PricingPage() {
 
   const { loading, user } = useAuth()
+  const router = useRouter()
 
   function activeTrial() {
     if (!user) return
@@ -21,8 +23,11 @@ export default function PricingPage() {
       isTrial: true,
       trialDateEnd: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
       credits: 30000,
-      creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
+      creditsExpiresAt: new Date(new Date().setDate(new Date().getDate() + 29)).toISOString(),
+      plan: 'free'
     })
+
+    router.push('/')
   }
 
   return (
