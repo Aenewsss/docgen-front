@@ -72,9 +72,9 @@ export default function Home() {
           </p>
         </div>
 
-        <Button onClick={() => setShowOrganizationsModal(true)} className="mb-8">
+        {user && <Button onClick={() => setShowOrganizationsModal(true)} className="mb-8">
           <Settings /> Gerenciar Acesso às Organizações
-        </Button>
+        </Button>}
 
         <Suspense fallback={<div>Carregando...</div>}>
           <Upload />
