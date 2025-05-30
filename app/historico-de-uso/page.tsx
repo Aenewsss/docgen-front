@@ -10,20 +10,24 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { MultiSelect } from '@/components/multiselect'
 import Footer from '@/components/footer'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function Page() {
-    const [data, setData] = useState<any[]>([])
     const { user } = useAuth()
 
+    const [data, setData] = useState<any[]>([])
     const [selectedProjects, setSelectedProjects] = useState<string[]>([])
     const [startDate, setStartDate] = useState<Date | null>(null)
     const [endDate, setEndDate] = useState<Date | null>(null)
     const [availableProjects, setAvailableProjects] = useState<string[]>([])
     const [availableDates, setAvailableDates] = useState<string[]>([])
+    const [projectsLoading, setProjectsLoading] = useState(true);
 
     useEffect(() => {
         if (!user) return
 
+        setProjectsLoading(true)
         const userRef = ref(db, `files_analysis/${user.uid}`)
         onValue(userRef, (snapshot) => {
             const val = snapshot.val()
@@ -77,6 +81,7 @@ export default function Page() {
                 )
             )
             setAvailableDates(chartData.map((item) => item.date))
+            setProjectsLoading(false)
         })
     }, [user])
 
@@ -90,6 +95,17 @@ export default function Page() {
             : true
         return matchesProject && matchesDate
     })
+
+    if (!projectsLoading && !data.length) return <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="relative flex items-center justify-center h-[90vh]">
+            <div className="absolute top-0 left-0 w-full h-full bg-zinc-900 opacity-20"></div>
+            <Image className="absolute top-0 left-0 w-screen h-full object-cover" width={300} height={300} src="/empty-state-historic.png" alt="Empty State Historic" />
+            <h1 className="absolute text-4xl text-white p-2 z-10 shadow-black shadow-lg font-bold tracking-tight sm:text-5xl md:text-6xl">Histórico indisponível</h1>
+            <Link className="absolute text-lg mt-32  transition-all hover:backdrop-blur-lg hover:scale-105 text-white p-2 z-10 shadow-black shadow-lg font-bold tracking-tight" href="/">Clique para selecionar um projeto</Link>
+        </main>
+        <Footer />
+    </div>
 
     return (
         <div className="min-h-screen flex flex-col">

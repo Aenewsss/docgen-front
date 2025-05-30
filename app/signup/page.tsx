@@ -10,6 +10,7 @@ import { ref, set } from "firebase/database";
 import { callCheckoutPage } from "@/utils/call-checkout-page";
 import { Loader2 } from "lucide-react";
 import Footer from "@/components/footer";
+import { toast, ToastContainer } from "react-toastify";
 
 function SignupForm() {
 
@@ -47,7 +48,7 @@ function SignupForm() {
                     isTrial: !loginData.plan ? false : true,
                     trialDateEnd: !loginData.plan ? null : new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
                     credits: !loginData.plan ? 0 : 30000,
-                    creditsExpiresAt: !loginData.plan ? null:new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
+                    creditsExpiresAt: !loginData.plan ? null : new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
                 })
 
                 loginData.plan == 'free'
@@ -56,7 +57,30 @@ function SignupForm() {
                         ? router.push("/pricing")
                         : callCheckoutPage(result.user.email!, result.user.uid, loginData.plan, loginData.billingCycle)
             })
-            .catch(e => alert(`Erro ao tentar criar conta: ${e.message}`))
+            .catch(e => {
+                let errorMessage = "Erro ao tentar criar conta.";
+
+                switch (e.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = "Este e-mail já está em uso.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "E-mail inválido.";
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = "A senha é muito fraca. Use pelo menos 6 caracteres.";
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = "Cadastro com e-mail e senha não está habilitado.";
+                        break;
+                    default:
+                        errorMessage = "Erro inesperado: " + e.message;
+                        break;
+                }
+
+                // alert(errorMessage);
+                toast.error(errorMessage, {position: 'bottom-center'});
+            })
             .finally(() => setIsLoading(false))
     }
 
@@ -84,35 +108,35 @@ function SignupForm() {
         <form className="space-y-4 border rounded-md p-10 min-w-[400px]">
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Nome*</label>
-                <input value={loginData.name} onChange={(e: any) => setLoginData({ ...loginData, name: e.target.value })} className="border rounded-md p-2" type="text" />
+                <input value={loginData.name} onChange={(e: any) => setLoginData({ ...loginData, name: e.target.value })} className="dark:text-black border rounded-md p-2" type="text" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">E-mail*</label>
-                <input value={loginData.email} onChange={(e: any) => setLoginData({ ...loginData, email: e.target.value })} className="border rounded-md p-2" type="email" />
+                <input value={loginData.email} onChange={(e: any) => setLoginData({ ...loginData, email: e.target.value })} className="dark:text-black border rounded-md p-2" type="email" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Senha*</label>
-                <input value={loginData.password} onChange={(e: any) => setLoginData({ ...loginData, password: e.target.value })} className="border rounded-md p-2" type="password" />
+                <input value={loginData.password} onChange={(e: any) => setLoginData({ ...loginData, password: e.target.value })} className="dark:text-black border rounded-md p-2" type="password" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Repetir Senha*</label>
-                <input value={loginData.repeatPassword} onChange={(e: any) => setLoginData({ ...loginData, repeatPassword: e.target.value })} className="border rounded-md p-2" type="password" />
+                <input value={loginData.repeatPassword} onChange={(e: any) => setLoginData({ ...loginData, repeatPassword: e.target.value })} className="dark:text-black border rounded-md p-2" type="password" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Empresa*</label>
-                <input value={loginData.company} onChange={(e: any) => setLoginData({ ...loginData, company: e.target.value })} className="border rounded-md p-2" type="text" />
+                <input value={loginData.company} onChange={(e: any) => setLoginData({ ...loginData, company: e.target.value })} className="dark:text-black border rounded-md p-2" type="text" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">País*</label>
-                <input value={loginData.country} onChange={(e: any) => setLoginData({ ...loginData, country: e.target.value })} className="border rounded-md p-2" type="text" />
+                <input value={loginData.country} onChange={(e: any) => setLoginData({ ...loginData, country: e.target.value })} className="dark:text-black border rounded-md p-2" type="text" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Cidade*</label>
-                <input value={loginData.city} onChange={(e: any) => setLoginData({ ...loginData, city: e.target.value })} className="border rounded-md p-2" type="text" />
+                <input value={loginData.city} onChange={(e: any) => setLoginData({ ...loginData, city: e.target.value })} className="dark:text-black border rounded-md p-2" type="text" />
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Telefone*</label>
-                <input value={loginData.phone} onChange={handleChangePhone} className="border rounded-md p-2" type="tel" />
+                <input value={loginData.phone} onChange={handleChangePhone} className="dark:text-black border rounded-md p-2" type="tel" />
             </div>
             <Button disabled={isLoading} type="button" onClick={handleSignup} className="w-full" variant="default">
                 {isLoading && <Loader2 className="w-12 h-12 animate-spin" />}
@@ -132,6 +156,7 @@ export default function Page() {
                 </Suspense>
             </main>
             <Footer />
+            <ToastContainer />
         </div>
     );
 }

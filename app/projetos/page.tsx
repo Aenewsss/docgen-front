@@ -33,6 +33,7 @@ export default function Page() {
     const [projectsLoading, setProjectsLoading] = useState(false);
     const [readmeContent, setReadmeContent] = useState('');
     const [isReadmeModalOpen, setIsReadmeModalOpen] = useState(false);
+    const [readmeCooldown, setReadmeCooldown] = useState(false);
 
     async function fetchLastReadme() {
         if (!user || !currentPath) return;
@@ -79,6 +80,7 @@ export default function Page() {
 
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val()
+            if (!data) return setProjectsLoading(false)
             setProjects(Object.entries(data).map(([key, value]: any) => ({ name: key, autoUpdate: value?.autoUpdate || false })))
             setProjectsLoading(false)
         });
@@ -107,7 +109,7 @@ export default function Page() {
 
     async function generateReadme() {
         try {
-            toast("O README será enviado por email!", { position: 'bottom-center' });
+            toast("O README será enviado por email! Aguarde alguns minutos.", { position: 'bottom-center' });
             fetch(`${process.env.NEXT_PUBLIC_N8N_README}`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -116,9 +118,21 @@ export default function Page() {
                     userEmail: user.email
                 })
             })
+                .then(_ => {
+                    setWaitToGenerateAnotherReadme();
+                })
+                .catch(e => toast.error('Erro ao gerar readme. Tente novamente mais tarde', {position: 'bottom-center'}))
         } catch (e: any) {
             console.log(e.message)
         }
+    }
+
+    // Função para controlar o tempo de espera para gerar outro README
+    function setWaitToGenerateAnotherReadme() {
+        setReadmeCooldown(true)
+        setTimeout(() => {
+            setReadmeCooldown(false)
+        }, 5 * 60 * 1000);
     }
 
     async function sendNewMessage() {
@@ -233,7 +247,7 @@ export default function Page() {
                 </div>
             )}
             <Header />
-            <main className={`flex-1 flex flex-col mb-10 ${projects.length ? `` : `-mt-20`}`}>
+            <main className={`flex-1 flex flex-col ${projects.length ? `` : `-mt-20`}`}>
                 {projects.length ?
                     !currentPath
                         ? <section className="mt-20 w-full flex flex-col items-center justify-center mx-auto max-w-6xl ">
@@ -322,7 +336,7 @@ export default function Page() {
                         </section>
                         : <div className="w-full flex gap-10 flex-1">
                             {/* DocumentAI Chat */}
-                            <div className="p-4 text-start w-1/2 shadow-md flex-1 flex flex-col justify-between bg-zinc-900">
+                            <div className="p-4 text-start w-1/2 shadow-md flex-1 flex flex-col justify-between bg-zinc-900 dark:bg-black">
                                 <div className="flex flex-col">
                                     <h2 className="text-xl font-semibold mb-0 text-white">Converse com a DocumentAI</h2>
                                     <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
@@ -396,7 +410,7 @@ export default function Page() {
                                     <h2 className="text-2xl font-medium">README</h2>
                                     <div className="flex gap-4 mb-4">
                                         <Tooltip message={currentProjectFolder?.lastReadme && "Só sera possível gerar outro readme se o código for alterado."}>
-                                            <Button disabled={currentProjectFolder?.lastReadme} onClick={generateReadme} variant="outline">
+                                            <Button disabled={readmeCooldown || currentProjectFolder?.lastReadme} onClick={generateReadme} variant="outline">
                                                 <CirclePlus />
                                                 Gerar novo
                                             </Button>

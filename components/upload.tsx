@@ -28,6 +28,7 @@ export function Upload() {
   const [isCheckingCharacters, setIsCheckingCharacters] = useState(false);
   const [documentName, setDocumentName] = useState("");
   const [visibility, setVisibility] = useState("");
+  const [type, setType] = useState("");
   const [filteredRepos, setFilteredRepos] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [tokenEstimation, setTokenEstimation] = useState<any>(null);
@@ -47,8 +48,9 @@ export function Upload() {
     const result = repos.filter((el: any) => {
       const matchesName = documentName === "" || lower(el.name).includes(lower(documentName));
       const matchesVisibility = visibility ? visibility === "Privado" ? el.private === true : el.private === false : true
+      const matchesType = type ? type == el.type : true
 
-      return matchesName && matchesVisibility;
+      return matchesName && matchesVisibility && matchesType;
     });
 
     setFilteredRepos(result);
@@ -93,7 +95,9 @@ export function Upload() {
   }
 
   async function getReposData(token?: string) {
+    if (!token) return
     setIsUploading(true)
+
     try {
       const response = await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/github/repos?user_id=${user.uid}&email=${user.email}`, {
         headers: {
@@ -195,7 +199,7 @@ export function Upload() {
 
       {showModal && tokenEstimation && (
         <div className="fixed inset-0 bg-zinc-900 bg-opacity-50 z-[60] flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-lg shadow-lg">
+          <div className="bg-white dark:bg-black rounded-lg p-6 max-w-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-4">Sobre o projeto</h2>
             <p className="mb-2">Organização: <strong>{tokenEstimation.repo.split('/')[0]}</strong></p>
             <p className="mb-2">Repositório: <strong>{tokenEstimation.repo.split('/')[1]}</strong></p>
@@ -203,10 +207,12 @@ export function Upload() {
             <p className="mb-2">Caracteres totais: <strong>{tokenEstimation.total_characters?.toLocaleString('pt-BR')}</strong></p>
             <p className="mb-2">Créditos estimados: <strong>{tokenEstimation.estimated_tokens?.toLocaleString('pt-BR')}</strong></p>
 
-            <label htmlFor="autoUpdate" className="text-sm font-medium text-gray-700">
-              Atualizar automaticamente quando houver mudanças na branch principal
+            <div className="flex justify-between my-10">
+              <label htmlFor="autoUpdate" className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                Atualizar automaticamente quando houver mudanças na branch principal do repo
+              </label>
               <Switch checked={autoUpdate} onCheckedChange={(checked) => setAutoUpdate(checked)} />
-            </label>
+            </div>
 
             {
               tokenEstimation.estimated_tokens.toLocaleString('pt-BR') > user.credits
@@ -220,17 +226,17 @@ export function Upload() {
                   Limite de créditos atingido
                 </button>
                 :
-                <div className="flex justify-end gap-4 mt-4">
+                <div className="flex justify-start gap-4 mt-4">
                   <button
                     onClick={() => {
                       handleRepoDownload(tokenEstimation.repo); // novo nome da função original
                       setShowModal(false);
                     }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:scale-105 transition-all"
+                    className="px-4 py-2 bg-black dark:bg-white dark:text-black text-white rounded hover:scale-105 transition-all shadow-md shadow-white"
                   >
-                    Confirmar Análise
+                    DocumentAI
                   </button>
-                  <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded hover:scale-105 transition-all">
+                  <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-red-500 rounded hover:scale-105 transition-all ">
                     Cancelar
                   </button>
                 </div>
@@ -282,7 +288,7 @@ export function Upload() {
                           <input
                             type="text"
                             placeholder="Nome do Documento"
-                            className="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm placeholder-gray-500 w-full"
+                            className="dark:text-black px-4 py-2 rounded-md border border-gray-300 bg-white text-sm placeholder-gray-500 w-full"
                             value={documentName}
                             onChange={(e) => setDocumentName(e.target.value)}
                             onKeyDown={(e) => {
@@ -294,10 +300,19 @@ export function Upload() {
 
                           <select
                             className="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm text-black"
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                          >
+                            <option defaultValue={''}>Tipo</option>
+                            <option value={'User'}>Usuário</option>
+                            <option value={'Organization'}>Organização</option>
+                          </select>
+                          <select
+                            className="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm text-black"
                             value={visibility}
                             onChange={(e) => setVisibility(e.target.value)}
                           >
-                            <option defaultValue={''}>Tipo do repositório</option>
+                            <option defaultValue={''}>Visiblidade</option>
                             <option value={'Público'}>Público</option>
                             <option value={'Privado'}>Privado</option>
                           </select>
@@ -356,8 +371,8 @@ export function Upload() {
                     {/* <input type="file" id="file-upload" className="hidden" accept=".zip" onChange={handleFileChange} /> */}
                     <Button className="cursor-pointer group-hover:scale-105 transition-all group-hover:bg-white group-hover:text-black" asChild>
                       <label htmlFor="file-upload">
-                        <img className="group-hover:hidden" src="/github.svg" alt="Github logo" width={16} height={16} />
-                        <img className="hidden group-hover:block" src="/github-black.svg" alt="Github logo black" width={16} height={16} />
+                        <img className="group-hover:hidden dark:hidden" src="/github.svg" alt="Github logo" width={16} height={16} />
+                        <img className="dark:block hidden group-hover:block" src="/github-black.svg" alt="Github logo black" width={16} height={16} />
                         Conectar github
                       </label>
                     </Button>
