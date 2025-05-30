@@ -83,8 +83,8 @@ export default function Home() {
         <CongratsModal loading={loading} user={user} />
         <CongratsCreditsModal loading={loading} user={user} />
 
-        <Features />
-        <Examples />
+        {!user && <Features />}
+        {!user && <Examples />}
         {showOrganizationsModal && (
           <div className="fixed inset-0 bg-zinc-900 bg-opacity-80 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg w-full max-w-2xl p-6 relative">

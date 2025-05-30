@@ -45,6 +45,7 @@ export function useAuth() {
         setUser(null)
         signOut(auth)
         router.push("/")
+        window.location.reload()
     }
 
     return { user, loading, logout };

@@ -262,7 +262,7 @@ export function Upload() {
               </div>
             ) :
               isLoading || user?.repo_loading ? (
-                <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="flex flex-col items-center justify-center space-y-4 md:min-h-[600px]">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                   <div className="space-y-2">
                     <h3 className="text-xl font-medium">Documentando seu projeto</h3>
@@ -271,7 +271,7 @@ export function Upload() {
                 </div>
               ) :
                 isUploading ? (
-                  <div className="flex flex-col items-center justify-center space-y-4">
+                  <div className="flex flex-col items-center justify-center space-y-4 md:min-h-[600px]">
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
                     <div className="space-y-2">
                       <h3 className="text-xl font-medium">Processando seus projetos</h3>
@@ -330,15 +330,15 @@ export function Upload() {
                     </div>
                     <div className="md:min-h-[380px] flex flex-wrap gap-4 justify-center">
 
-                    {currentRepos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="cursor-pointer transition-all hover:scale-105 flex flex-col items-center text-center justify-center space-y-4 w-1/2 max-w-[300px]">
-                      <FileArchive className="h-12 w-12 text-primary" />
-                      <div className="space-y-2">
-                        <h3 className="text-x font-medium">{el.name}</h3>
-                        <a target="_blank" href={el.clone_url}>
-                          <p className="text-muted-foreground flex gap-1 items-center justify-center border-b border-transparent hover:border-muted-foreground mx-4"><Link2 className="mt-1" width={16} height={16} />github</p>
-                        </a>
-                      </div>
-                    </div>)}
+                      {currentRepos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="cursor-pointer transition-all hover:scale-105 flex flex-col items-center text-center justify-center space-y-4 w-1/2 max-w-[300px]">
+                        <FileArchive className="h-12 w-12 text-primary" />
+                        <div className="space-y-2">
+                          <h3 className="text-x font-medium">{el.name}</h3>
+                          <a target="_blank" href={el.clone_url}>
+                            <p className="text-muted-foreground flex gap-1 items-center justify-center border-b border-transparent hover:border-muted-foreground mx-4"><Link2 className="mt-1" width={16} height={16} />github</p>
+                          </a>
+                        </div>
+                      </div>)}
                     </div>
                     <div className="flex justify-center gap-4 mt-6 w-full">
                       <button
