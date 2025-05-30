@@ -24,8 +24,8 @@ export function Examples() {
           <TabsContent value="frontend" className="space-y-4">
             <Card>
               <CardContent className="p-4">
-                <Markdown className="max-w-none">
-{`
+                <Markdown className="max-w-none prose dark:prose-invert max-h-[500px] overflow-y-auto">
+                  {`
 # 📄 Documentação Técnica: \`page.tsx\`<br />
 <br />
 **📁 Arquivo:**<br />
@@ -141,7 +141,8 @@ TypeScript (React / Next.js)<br />
           <TabsContent value="backend" className="space-y-4">
             <Card>
               <CardContent className="p-4">
-                <Markdown>{`
+                <Markdown className="max-w-none prose dark:prose-invert max-h-[500px] overflow-y-auto">
+                  {`
 ### 📁 Arquivo: \`check-insta-status.py\`
 <br/>
 ### 🔍 Linguagem: Python
@@ -217,7 +218,7 @@ print(f"Perfil Ativo: {verificar_anuncio_ocr(url_anuncio)}")
                 />
               </CardContent>
             </Card>
-         
+
           </TabsContent>
         </Tabs>
       </div>

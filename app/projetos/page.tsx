@@ -8,18 +8,20 @@ import { Switch } from "@/components/ui/switch";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, onValue, push, ref, update } from "firebase/database";
-import { CirclePlus, CodeXml, Dot, Eye, Folder, Github, Loader2, Settings } from "lucide-react";
+import { CirclePlus, CodeXml, Dot, Expand, Eye, Folder, Github, Loader2, Minimize, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown"
 import { ToastContainer, toast } from 'react-toastify';
+import remarkGfm from 'remark-gfm'
 
 export default function Page() {
     const toastShownRef = useRef(false);
 
     const { loading, user } = useAuth()
 
+    const [showChatModal, setShowChatModal] = useState(false);
     const [projects, setProjects] = useState<any[]>([]);
     const [showSettingsModal, setShowSettingsModal] = useState<number | null>(null);
     const [currentProjectFolder, setCurrentProjectFolder] = useState<any>();
@@ -240,9 +242,8 @@ export default function Page() {
                         >
                             ×
                         </button>
-                        <h2 className="text-2xl font-bold mb-4">Último README.md</h2>
-                        <div className="prose max-h-[70vh] overflow-y-auto">
-                            <ReactMarkdown>{readmeContent}</ReactMarkdown>
+                        <div className="prose dark:prose-invert max-h-[70vh] overflow-y-auto min-w-full">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{readmeContent}</ReactMarkdown>
                         </div>
                     </div>
                 </div>
@@ -337,11 +338,11 @@ export default function Page() {
                         </section>
                         : <div className="w-full flex gap-10 flex-1">
                             {/* DocumentAI Chat */}
-                            <div className="p-4 text-start w-1/2 shadow-md flex-1 flex flex-col justify-between bg-zinc-900 dark:bg-black">
+                            <div className={`p-4 text-start w-1/2 shadow-md flex-1 flex flex-col bg-zinc-900 dark:bg-black ${showChatModal && 'fixed top-0 left-0 z-[60] backdrop-blur-sm w-screen h-screen'}`}>
                                 <div className="flex flex-col">
                                     <h2 className="text-xl font-semibold mb-0 text-white">Converse com a DocumentAI</h2>
                                     <p className="mb-4 text-muted-foreground">Tire dúvidas sobre o seu projeto</p>
-                                    <div className=" py-4 border-t border-[rgb(30,30,30)] space-y-4 h-[calc(100vh-300px)] overflow-y-auto">
+                                    <div className={` py-4 border-t border-[rgb(30,30,30)] space-y-4 h-[calc(100vh-300px)] overflow-y-auto ${showChatModal && 'h-[calc(100vh-160px)]'}`}>
                                         <div className="flex gap-2 items-start">
                                             <div className="w-10 h-10 bg-[rgb(30,30,30)] rounded-full flex justify-center items-center">
                                                 <Image className="w-[60%] h-[60%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocumentAI Icon" />
@@ -356,8 +357,8 @@ export default function Page() {
                                                     <div className="w-8 h-8 bg-[rgb(30,30,30)] rounded-full flex justify-center items-center">
                                                         <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocumentAI Icon" />
                                                     </div>
-                                                    <p className="bg-[rgb(30,30,30)] text-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
-                                                        <ReactMarkdown>{message.text}</ReactMarkdown>
+                                                    <p className="prose dark:prose-invert bg-[rgb(30,30,30)] text-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
                                                     </p>
                                                 </div>
                                                     :
@@ -391,7 +392,10 @@ export default function Page() {
                                         <div ref={messagesEndRef} className="min-h-[1px]" />
                                     </div>
                                 </div>
-                                <div className="mt-4 flex gap-2 ">
+                                <div className="mt-4 flex gap-2 items-center">
+                                    {!showChatModal
+                                        ? <Tooltip left={1} message="Tela cheia"><Expand onClick={() => setShowChatModal(true)} className="text-white cursor-pointer" /></Tooltip>
+                                        : <Tooltip left={1} message="Minimizar chat"><Minimize onClick={() => setShowChatModal(false)} className="text-white cursor-pointer" /></Tooltip>}
                                     <input
                                         type="text"
                                         placeholder="Digite sua mensagem..."
@@ -506,12 +510,21 @@ export default function Page() {
                 {
                     doc && <div className="fixed top-0 start-0 w-screen h-screen z-[60] flex justify-center items-center">
                         <div className="absolute w-full h-full backdrop-blur-md" onClick={() => setDoc('')}></div>
-                        <Card className="absolute z-10 h-[90%] w-[600px] p-4 pt-10 overflow-auto resize-x">
-                            <ReactMarkdown>{doc}</ReactMarkdown>
+                        <Card className="absolute z-10 h-[90%] w-[800px] p-4 pt-10 overflow-auto resize-x">
+                            <div className="prose dark:prose-invert min-w-full">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{doc}</ReactMarkdown>
+                            </div>
                             <button onClick={() => setDoc('')} className="bg-red-600 absolute top-2 end-2 text-white w-6 h-6 rounded-full text-center transition-all hover:scale-105 cursor-pointer">X</button>
                         </Card>
                     </div>
                 }
+                {/* {
+                    showChatModal && <div className="fixed top-0 start-0 w-screen h-screen z-[60] flex justify-center items-center">
+                        <div className="absolute w-full h-full backdrop-blur-md" onClick={() => setDoc('')}></div>
+                        <Card className="absolute z-10 h-[90%] w-[800px] p-4 pt-10 overflow-auto resize-x">
+                        </Card>
+                    </div>
+                } */}
             </main >
             <footer className={`border-t py-6 md:py-8 flex items-center justify-center gap-4 md:flex-row md:gap-8 ${!projects.length ? `absolute bottom-0 left-0 w-full backdrop-blur-sm h-fit -mb-4` : `bg-zinc-900`}`}>
                 <p className={`text-center text-sm text-white`}>© 2025 DocumentAI. Todos os direitos reservados.

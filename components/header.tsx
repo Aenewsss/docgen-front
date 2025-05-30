@@ -61,13 +61,13 @@ export function Header() {
             {/* @ts-ignore */}
             {user.credits && user.plan && <Button className="cursor-auto hover:bg-white dark:hover:bg-transparent" variant="ghost" >🪙 Créditos: <span className={`font-semibold ${Number(user.credits) < 0 ? 'text-red-500' : 'text-black dark:text-white'}`}>{(user.credits as string).toLocaleString('pt-BR')}</span></Button>}
             <Button className="cursor-auto  px-1 dark:hover:bg-transparent" variant="ghost" >{user.email}</Button>
-            <Tooltip message="Alterar tema" position="bottom">
+            <Tooltip message="Alterar tema" positionY="bottom">
               <Button onClick={toggleTheme} className="p-0 me-4 hover:bg-transparent hover:scale-[1.3] transition-all" variant="ghost" ><Contrast className=" h-16 w-16 scale-125" /></Button>
             </Tooltip>
             <Button onClick={logout} variant="destructive">Sair</Button>
           </div>
           : <div className="flex items-center gap-2">
-            <Tooltip message="Alterar tema" position="bottom">
+            <Tooltip message="Alterar tema" positionY="bottom">
               <Button onClick={toggleTheme} className="p-0 me-4 hover:bg-transparent hover:scale-[1.3] transition-all" variant="ghost" ><Contrast className=" h-16 w-16 scale-125" /></Button>
             </Tooltip>
             <Button variant="ghost" asChild>
