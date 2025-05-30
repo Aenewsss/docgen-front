@@ -102,6 +102,7 @@ export default function Page() {
             if (snapshot.exists()) {
                 const data = snapshot.val()
                 setCurrentProjectFolder(data)
+                project && setReadmeContent(data?.lastReadme);
                 !currentPath && setCurrentPath(path.includes('documentations') ? path.split('/').slice(1).join('/') : path)
             }
         })
@@ -121,7 +122,7 @@ export default function Page() {
                 .then(_ => {
                     setWaitToGenerateAnotherReadme();
                 })
-                .catch(e => toast.error('Erro ao gerar readme. Tente novamente mais tarde', {position: 'bottom-center'}))
+                .catch(e => toast.error('Erro ao gerar readme. Tente novamente mais tarde', { position: 'bottom-center' }))
         } catch (e: any) {
             console.log(e.message)
         }
@@ -415,7 +416,7 @@ export default function Page() {
                                                 Gerar novo
                                             </Button>
                                         </Tooltip>
-                                        {currentProjectFolder?.lastReadme &&
+                                        {readmeContent &&
                                             <>
                                                 <Button variant="outline" onClick={fetchLastReadme}>
                                                     <Eye />

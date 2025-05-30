@@ -11,6 +11,7 @@ import { callCheckoutPage } from "@/utils/call-checkout-page";
 import { Loader2 } from "lucide-react";
 import Footer from "@/components/footer";
 import { toast, ToastContainer } from "react-toastify";
+import Link from "next/link";
 
 function SignupForm() {
 
@@ -79,7 +80,7 @@ function SignupForm() {
                 }
 
                 // alert(errorMessage);
-                toast.error(errorMessage, {position: 'bottom-center'});
+                toast.error(errorMessage, { position: 'bottom-center' });
             })
             .finally(() => setIsLoading(false))
     }
@@ -138,6 +139,8 @@ function SignupForm() {
                 <label htmlFor="">Telefone*</label>
                 <input value={loginData.phone} onChange={handleChangePhone} className="dark:text-black border rounded-md p-2" type="tel" />
             </div>
+            <Link href="/login" className="cursor-pointer underline text-sm text-center flex self-center justify-self-center">Já tenho conta</Link>
+
             <Button disabled={isLoading} type="button" onClick={handleSignup} className="w-full" variant="default">
                 {isLoading && <Loader2 className="w-12 h-12 animate-spin" />}
                 Cadastrar

@@ -54,7 +54,7 @@ export default function Page() {
             limitations: [
                 "Acesso antecipado ao roadmap de features",
             ],
-            cta: "Upgrade",
+            cta: user?.plan != "starter" ? "Downgrade" : "Upgrade",
             popular: false,
         },
         {
@@ -81,7 +81,7 @@ export default function Page() {
             ],
             limitations: [
             ],
-            cta: "Upgrade",
+            cta: user?.plan == "enterprise" ? "Downgrade" : "Upgrade",
             popular: true,
         },
         {
