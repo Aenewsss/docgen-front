@@ -4,7 +4,7 @@ import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/config";
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
@@ -16,6 +16,7 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(false);
     const [loginData, setLoginData] = useState({ email: '', password: '' });
     const [showResetPassword, setShowResetPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     function handleLogin() {
         setIsLoading(true);
@@ -66,10 +67,26 @@ export default function Page() {
                         <label htmlFor="">E-mail</label>
                         <input value={loginData.email} onChange={(e: any) => setLoginData({ ...loginData, email: e.target.value })} className="dark:text-black border rounded-md p-2" type="email" />
                     </div>
-                    {!showResetPassword && <div className="mb-3 flex flex-col gap-1">
-                        <label htmlFor="">Senha</label>
-                        <input value={loginData.password} onChange={(e: any) => setLoginData({ ...loginData, password: e.target.value })} className="dark:text-black border rounded-md p-2" type="password" />
-                    </div>}
+                    {!showResetPassword && (
+                        <div className="mb-3 flex flex-col gap-1">
+                            <label htmlFor="">Senha</label>
+                            <div className="relative">
+                                <input
+                                    value={loginData.password}
+                                    onChange={(e: any) => setLoginData({ ...loginData, password: e.target.value })}
+                                    className="dark:text-black border rounded-md p-2 pr-10 w-full"
+                                    type={showPassword ? "text" : "password"}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                                >
+                                    {showPassword ? <EyeOff className="dark:text-black" size={18} /> : <Eye className="dark:text-black" size={18} />}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     <Button disabled={isLoading} type="button" onClick={() => !showResetPassword ? handleLogin() : resetPassword()} className="w-full" variant="default">
                         {isLoading && <Loader2 className="w-12 h-12 animate-spin" />}
                         {!showResetPassword ? 'Login' : 'Receber nova senha'}

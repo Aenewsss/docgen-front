@@ -8,7 +8,7 @@ import { auth, db } from "@/firebase/config";
 import { Button } from "@/components/ui/button";
 import { ref, set } from "firebase/database";
 import { callCheckoutPage } from "@/utils/call-checkout-page";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import Footer from "@/components/footer";
 import { toast, ToastContainer } from "react-toastify";
 import Link from "next/link";
@@ -24,6 +24,9 @@ function SignupForm() {
         name: '', company: '', phone: '', country: '',
         city: '', role: '', plan: '', billingCycle: ''
     });
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
     useEffect(() => {
         setLoginData({ ...loginData, plan: searchParams.get("plan") || '', billingCycle: searchParams.get("billingCycle") || '' })
@@ -117,11 +120,39 @@ function SignupForm() {
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Senha*</label>
-                <input value={loginData.password} onChange={(e: any) => setLoginData({ ...loginData, password: e.target.value })} className="dark:text-black border rounded-md p-2" type="password" />
+                <div className="relative">
+                    <input
+                        value={loginData.password}
+                        onChange={(e: any) => setLoginData({ ...loginData, password: e.target.value })}
+                        className="dark:text-black border rounded-md p-2 w-full pr-10"
+                        type={showPassword ? "text" : "password"}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+                    >
+                        {!showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                    </button>
+                </div>
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Repetir Senha*</label>
-                <input value={loginData.repeatPassword} onChange={(e: any) => setLoginData({ ...loginData, repeatPassword: e.target.value })} className="dark:text-black border rounded-md p-2" type="password" />
+                <div className="relative">
+                    <input
+                        value={loginData.repeatPassword}
+                        onChange={(e: any) => setLoginData({ ...loginData, repeatPassword: e.target.value })}
+                        className="dark:text-black border rounded-md p-2 w-full pr-10"
+                        type={showRepeatPassword ? "text" : "password"}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+                    >
+                        {!showRepeatPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                    </button>
+                </div>
             </div>
             <div className="mb-3 flex flex-col gap-1">
                 <label htmlFor="">Empresa*</label>

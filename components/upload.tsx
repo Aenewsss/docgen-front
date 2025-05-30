@@ -4,7 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { UploadIcon, FileArchive, Loader2, Link2 } from "lucide-react"
+import { UploadIcon, FileArchive, Loader2, Link2, ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -328,6 +328,8 @@ export function Upload() {
                         <button onClick={handleSearch} className="bg-zinc-900 dark:bg-white dark:text-black text-white px-6 py-2 rounded-md text-sm hover:opacity-90 transition">Buscar</button>
                       </div>
                     </div>
+                    <div className="md:min-h-[380px] flex flex-wrap gap-4 justify-center">
+
                     {currentRepos.map((el: any, index) => <div onClick={() => handleRepoSelect(el)} key={index} className="cursor-pointer transition-all hover:scale-105 flex flex-col items-center text-center justify-center space-y-4 w-1/2 max-w-[300px]">
                       <FileArchive className="h-12 w-12 text-primary" />
                       <div className="space-y-2">
@@ -337,27 +339,44 @@ export function Upload() {
                         </a>
                       </div>
                     </div>)}
+                    </div>
                     <div className="flex justify-center gap-4 mt-6 w-full">
+                      <button
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-200 dark:bg-zinc-900 rounded disabled:opacity-50"
+                      >
+                        <ChevronsLeft className="w-5 h-5" />
+                      </button>
+
                       <button
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                         className="px-4 py-2 bg-gray-200 dark:bg-zinc-900 rounded disabled:opacity-50"
                       >
-                        Anterior
+                        <ChevronLeft className="w-5 h-5" />
                       </button>
 
-                      <span className="self-center">Página {currentPage}</span>
+                      <span className="self-center">{currentPage} de {Math.ceil(filteredRepos.length / reposPerPage)}</span>
 
                       <button
                         onClick={() =>
                           setCurrentPage((prev) =>
-                            indexOfLastRepo < filteredRepos?.length ? prev + 1 : prev
+                            indexOfLastRepo < filteredRepos.length ? prev + 1 : prev
                           )
                         }
-                        disabled={indexOfLastRepo >= filteredRepos?.length}
+                        disabled={indexOfLastRepo >= filteredRepos.length}
                         className="px-4 py-2 bg-gray-200 dark:bg-zinc-900 rounded disabled:opacity-50"
                       >
-                        Próxima
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentPage(Math.ceil(filteredRepos.length / reposPerPage))}
+                        disabled={currentPage === Math.ceil(filteredRepos.length / reposPerPage)}
+                        className="px-4 py-2 bg-gray-200 dark:bg-zinc-900 rounded disabled:opacity-50"
+                      >
+                        <ChevronsRight className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
