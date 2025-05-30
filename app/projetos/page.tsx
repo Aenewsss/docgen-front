@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { db } from "@/firebase/config";
 import { useAuth } from "@/hooks/use-auth";
 import { get, onValue, push, ref, update } from "firebase/database";
-import { CirclePlus, CodeXml, Dot, Expand, Eye, Folder, Github, Loader2, Minimize, Settings } from "lucide-react";
+import { CirclePlus, CodeXml, Dot, Download, Expand, Eye, Folder, Github, Loader2, Minimize, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -228,6 +228,26 @@ export default function Page() {
         }
     }, [user, currentPath]);
 
+    async function downloadDocumentation() {
+        try {
+            toast("A documentação completa será enviada por e-mail. Aguarde alguns minutos", { position: 'bottom-center' });
+            await fetch(`${process.env.NEXT_PUBLIC_N8N_GENERATE_DOC_FILE}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project: currentPath.split('/')[1],
+                    user: user.uid,
+                    userEmail: user.email
+                })
+            });
+        } catch (e) {
+            toast.error("Erro ao gerar o arquivo DOC.", { position: 'bottom-center' });
+            console.error(e);
+        }
+    }
+
     if (loading || projectsLoading) return <Loading />
 
     return (
@@ -357,7 +377,7 @@ export default function Page() {
                                                     <div className="w-8 h-8 bg-[rgb(30,30,30)] rounded-full flex justify-center items-center">
                                                         <Image className="w-[70%] h-[70%] object-contain" src="/favicon.svg" width={8} height={8} alt="DocumentAI Icon" />
                                                     </div>
-                                                    <p className="prose dark:prose-invert bg-[rgb(30,30,30)] text-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
+                                                    <p className="prose prose-headings:text-white prose-p:text-white prose-li:text-white prose-code:text-white prose-strong:text-white dark:prose-invert bg-[rgb(30,30,30)] text-white p-3 rounded-lg shadow-sm max-w-[80%] text-start">
                                                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
                                                     </p>
                                                 </div>
@@ -432,6 +452,15 @@ export default function Page() {
                                                 </Button>
                                             </>
                                         }
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2 -mt-2">
+                                    <h2 className="text-2xl font-medium">Documentação</h2>
+                                    <div className="flex gap-4 mb-4">
+                                        <Button variant="outline" onClick={downloadDocumentation}>
+                                            <Folder />
+                                            Baixar documentação completa
+                                        </Button>
                                     </div>
                                 </div>
                                 <hr />
