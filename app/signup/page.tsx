@@ -52,7 +52,9 @@ function SignupForm() {
                     isTrial: !loginData.plan ? false : true,
                     trialDateEnd: !loginData.plan ? null : new Date(new Date().setDate(new Date().getDate() + 6)).toISOString(),
                     credits: !loginData.plan ? 0 : 30000,
-                    creditsExpiresAt: !loginData.plan ? null : new Date(new Date().setDate(new Date().getDate() + 29)).toISOString()
+                    creditsExpiresAt: !loginData.plan ? null : new Date(new Date().setDate(new Date().getDate() + 29)).toISOString(),
+                    readmesLeft: !loginData.plan ? 5 : loginData.plan == 'starter' ? 5 : loginData.plan == 'pro' ? 20 : 100,
+                    chatsLeft: !loginData.plan ? 50 : loginData.plan == 'starter' ? 50 : loginData.plan == 'pro' ? 250 : 1000,
                 })
 
                 loginData.plan == 'free'
