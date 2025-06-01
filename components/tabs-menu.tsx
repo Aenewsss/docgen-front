@@ -14,7 +14,7 @@ export default function TabsMenu() {
     const pathname = usePathname()
 
     return (
-        <div className="bg-zinc-900 text-white flex justify-center self-center rounded-full p-2 space-x-8 w-full max-w-xl mx-auto shadow-lg shadow-black -mt-2 z-[60] fixed top-[72px] bounce-custom ">
+        <div className="dark:bg-zinc-900 bg-white dark:text-white flex justify-center self-center rounded-full p-2 space-x-8 w-full max-w-xl mx-auto shadow-lg shadow-black -mt-2 z-[60] fixed top-[72px] bounce-custom ">
             {tabs.map(({ label, path }) => (
                 <Link
                     key={path}
