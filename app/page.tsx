@@ -183,6 +183,17 @@ export default function DocumentAILanding() {
     }
   ]
 
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
+
+  async function handleCheckout(plan: string, billingCycle: string) {
+    if (!user) return router.push(`/signup?plan=${plan.toLowerCase()}&billingCycle=${billingCycle}`)
+
+    const email = user.email
+    const userId = user.uid
+
+    callCheckoutPage(email, userId, plan, billingCycle)
+  }
+
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
       {/* Header */}
@@ -736,7 +747,7 @@ print(f"Perfil Ativo: {verificar_anuncio_ocr(url_anuncio)}")
                           <span className="text-sm text-zinc-300">Geração de README: até 20 arquivos/mês</span>
                         </li>
                       </ul>                  </div>
-                    <Button className="w-full dark:bg-[#374151] bg-black dar:hover:bg-[#1f2937] text-white">
+                    <Button onClick={() => handleCheckout("pro", isYearly ? "annual" : "monthly")} className="w-full dark:bg-[#374151] bg-black dar:hover:bg-[#1f2937] text-white">
                       Experimente Grátis
                     </Button>
                   </CardContent>
@@ -768,8 +779,8 @@ print(f"Perfil Ativo: {verificar_anuncio_ocr(url_anuncio)}")
                         </li>
                       </ul>
                     </div>
-                    <Button className="w-full bg-zinc-800 hover:bg-zinc-700 text-white">
-                      Falar com Vendas
+                    <Button onClick={() => handleCheckout("enterprise", isYearly ? "annual" : "monthly")} className="w-full bg-zinc-800 hover:bg-zinc-700 text-white">
+                      Experimente grátis
                     </Button>
                   </CardContent>
                 </Card>
