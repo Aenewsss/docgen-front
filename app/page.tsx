@@ -323,7 +323,7 @@ export default function DocumentAILanding() {
                           <step.icon className="h-8 w-8 text-white dark:text-[#545455]" />
                         </div>
                       </div>
-                      <h3 className="text-white dark:text-black text-xl font-semibold mb-3">{step.title}</h3>
+                      <h3 className="text-white text-xl font-semibold mb-3">{step.title}</h3>
                       <p className="text-gray-300 dark:text-gray-400 text-sm">{step.description}</p>
                     </CardContent>
                   </Card>
@@ -368,7 +368,7 @@ export default function DocumentAILanding() {
                         <div className="absolute -inset-4 bg-[#374151]/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <feature.icon className="h-8 w-8 text-white dark:text-[#374151]" />
                       </div>
-                      <h3 className="text-white dark:text-black text-xl font-semibold mb-3">{feature.title}</h3>
+                      <h3 className="text-white  text-xl font-semibold mb-3">{feature.title}</h3>
                       <p className="text-gray-300 dark:text-gray-400 text-sm leading-relaxed">{feature.description}</p>
                     </CardContent>
                   </Card>
@@ -680,10 +680,10 @@ print(f"Perfil Ativo: {verificar_anuncio_ocr(url_anuncio)}")
                 <Card className="border border-gray-800 bg-zinc-900/50 backdrop-blur-sm hover:border-zinc-700 transition-colors h-full">
                   <CardContent className="p-8 h-full flex flex-col">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2 dark:text-black text-white">Gratuito</h3>
+                      <h3 className="text-xl font-semibold mb-2  text-white">Gratuito</h3>
                       <p className="text-zinc-300 dark:text-zinc-400 text-sm mb-6">Para desenvolvedores individuais e projetos pequenos</p>
                       <div className="mb-6">
-                        <span className="text-white dark:text-black text-4xl font-bold">R$0</span>
+                        <span className="text-white  text-4xl font-bold">R$0</span>
                         <span className="text-zinc-300 dark:text-zinc-400 ml-2">/ mês</span>
                       </div>
                       <ul className="space-y-3 mb-8">
@@ -716,10 +716,10 @@ print(f"Perfil Ativo: {verificar_anuncio_ocr(url_anuncio)}")
                   </div>
                   <CardContent className="p-8 h-full flex flex-col">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2 dark:text-black text-white">Pro</h3>
+                      <h3 className="text-xl font-semibold mb-2  text-white">Pro</h3>
                       <p className="text-zinc-300 dark:text-zinc-400 text-sm mb-6">Para times e projetos em crescimento</p>
                       <div className="mb-6">
-                        <span className="text-white dark:text-black text-4xl font-bold">R${isYearly ? '69,99' : '89,90'}</span>
+                        <span className="text-white  text-4xl font-bold">R${isYearly ? '69,99' : '89,90'}</span>
                         <span className="text-zinc-300 dark:text-zinc-400 ml-2">/ mês</span>
                       </div>
                       <ul className="space-y-3 mb-8">
@@ -747,10 +747,10 @@ print(f"Perfil Ativo: {verificar_anuncio_ocr(url_anuncio)}")
                 <Card className="border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm hover:border-zinc-700 transition-colors h-full">
                   <CardContent className="p-8 h-full flex flex-col">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2 dark:text-black text-white">Enterprise</h3>
+                      <h3 className="text-xl font-semibold mb-2  text-white">Enterprise</h3>
                       <p className="text-zinc-300 dark:text-zinc-400 text-sm mb-6">Para grandes equipes e organizações</p>
                       <div className="mb-6">
-                        <span className="text-white dark:text-black text-4xl font-bold">R${isYearly ? '1869,90' : '155,82'}</span>
+                        <span className="text-white  text-4xl font-bold">R${isYearly ? '1869,90' : '155,82'}</span>
                         <span className="text-zinc-300 dark:text-zinc-400 ml-2">/ mês</span>
                       </div>
                       <ul className="space-y-3 mb-8">
