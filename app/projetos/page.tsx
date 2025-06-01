@@ -147,7 +147,8 @@ export default function Page() {
             method: 'POST',
             body: JSON.stringify({
                 newMessage,
-                project: currentPath.split('/')[1]
+                project: currentPath.split('/')[1],
+                user: user?.uid
             })
         })).json()
 
@@ -412,30 +413,34 @@ export default function Page() {
                                         <div ref={messagesEndRef} className="min-h-[1px]" />
                                     </div>
                                 </div>
-                                <div className="mt-4 flex gap-2 items-center">
-                                    {!showChatModal
-                                        ? <Tooltip left={1} message="Tela cheia"><Expand onClick={() => setShowChatModal(true)} className="text-white cursor-pointer" /></Tooltip>
-                                        : <Tooltip left={1} message="Minimizar chat"><Minimize onClick={() => setShowChatModal(false)} className="text-white cursor-pointer" /></Tooltip>}
-                                    <input
-                                        type="text"
-                                        placeholder="Digite sua mensagem..."
-                                        className="flex-1 px-4 py-2 border rounded-md shadow-sm bg-[rgba(20,20,20)] text-white outline-white"
-                                        value={newMessage}
-                                        onChange={(e: any) => setNewMessage(e.target.value)}
-                                        onKeyDown={e => {
-                                            if (!isLoading && e.key == 'Enter') sendNewMessage()
-                                        }}
-                                    />
-                                    <Button variant={"outline"} onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-black" /> : 'Enviar'}</Button>
-                                </div>
+                                <Tooltip message={(user?.chatsLeft < 1) ? 'Limite mensal de mensagens atingido.' : ''}>
+                                    <div className={`mt-4 flex gap-2 items-center ${(user?.chatsLeft < 1) ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        {!showChatModal
+                                            ? <Tooltip left={1} message="Tela cheia"><Expand onClick={() => setShowChatModal(true)} className="text-white cursor-pointer" /></Tooltip>
+                                            : <Tooltip left={1} message="Minimizar chat"><Minimize onClick={() => setShowChatModal(false)} className="text-white cursor-pointer" /></Tooltip>}
+                                        <input
+                                            type="text"
+                                            placeholder="Digite sua mensagem..."
+                                            className="flex-1 px-4 py-2 border rounded-md shadow-sm bg-[rgba(20,20,20)] text-white outline-white"
+                                            value={newMessage}
+                                            onChange={(e: any) => setNewMessage(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (!isLoading && e.key == 'Enter') sendNewMessage()
+                                            }}
+                                        />
+                                        <Tooltip message={user?.chatsLeft < 1 ? "Limite mensal atingido." : ""}>
+                                            <Button disabled={(user?.chatsLeft < 1)} variant={"outline"} onClick={() => !isLoading && sendNewMessage()} className="px-4 py-2">{isLoading ? <Loader2 className="h-12 w-12 animate-spin text-black" /> : 'Enviar'}</Button>
+                                        </Tooltip>
+                                    </div>
+                                </Tooltip>
                             </div>
                             <div className="flex flex-col gap-4 w-1/2 mt-10">
                                 {/* Mapa e projeto */}
                                 <div className="flex flex-col gap-2 mt-4">
                                     <h2 className="text-2xl font-medium">README</h2>
                                     <div className="flex gap-4 mb-4">
-                                        <Tooltip message={currentProjectFolder?.lastReadme && "Só sera possível gerar outro readme se o código for alterado."}>
-                                            <Button disabled={readmeCooldown || currentProjectFolder?.lastReadme} onClick={generateReadme} variant="outline">
+                                        <Tooltip message={currentProjectFolder?.lastReadme ? "Só sera possível gerar outro readme se o código for alterado." : user?.readmesLeft < 1 ? "Limite mensal atingido." : ""}>
+                                            <Button disabled={user?.readmesLeft < 1 || readmeCooldown || currentProjectFolder?.lastReadme} onClick={generateReadme} variant="outline">
                                                 <CirclePlus />
                                                 Gerar novo
                                             </Button>
