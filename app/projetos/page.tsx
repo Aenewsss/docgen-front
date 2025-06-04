@@ -273,7 +273,7 @@ export default function Page() {
             <main className={`flex-1 flex flex-col ${projects.length ? `` : `-mt-20`}`}>
                 {projects.length ?
                     !currentPath
-                        ? <section className="mt-20 w-full flex flex-col items-center justify-center mx-auto max-w-6xl ">
+                        ? <section className="mt-32 mb-10 w-full flex flex-col items-center justify-center mx-auto max-w-6xl ">
                             <h1 className="text-5xl font-semibold">Meus Projetos</h1>
                             <p className="text-xl text-muted-foreground mb-6">Aqui estão listados todos seus projetos documentados.</p>
                             <div className="flex gap-5 flex-wrap justify-center">
@@ -357,7 +357,7 @@ export default function Page() {
                                 )}
                             </div>
                         </section>
-                        : <div className="w-full flex gap-10 flex-1">
+                        : <div className="mt-16 w-full flex gap-10 flex-1">
                             {/* DocumentAI Chat */}
                             <div className={`p-4 text-start w-1/2 shadow-md flex-1 flex flex-col bg-zinc-900 dark:bg-black ${showChatModal && 'fixed top-0 left-0 z-[60] backdrop-blur-sm w-screen h-screen'}`}>
                                 <div className="flex flex-col">

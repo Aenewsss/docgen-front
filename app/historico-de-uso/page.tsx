@@ -110,9 +110,9 @@ export default function Page() {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-24 md:pt-10">
+            <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 md:py-24 md:pt-24">
                 <div className="p-8 max-w-7xl mx-auto w-full">
-                    <h1 className="text-2xl font-bold mb-6 text-center">Histórico de Uso de Créditos</h1>
+                    <h1 className="text-5xl font-bold mb-6 text-center">Histórico de Uso de Créditos</h1>
                     <div className="flex flex-col gap-4 mb-6">
                         <div className="flex gap-4 justify-center items-center flex-wrap">
                             <MultiSelect
